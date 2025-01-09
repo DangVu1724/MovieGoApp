@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/screens/homepage.dart';
+import 'package:movie_app/widgets/bottom_app_bar.dart';
 
-
-void main(){
+void main() {
   runApp(const MyApp());
 }
 
@@ -13,9 +12,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      
-      theme: ThemeData.dark(),
-      home: const HomePage(),
+      color: Colors.black,
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: Colors.black,
+        scaffoldBackgroundColor: Colors.black,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent
+      ),
+      home: const MainScreen(),
     );
   }
 }
+
+
+
+
+
