@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/screens/homepage.dart';
+import 'package:movie_app/screens/moviedetails.dart';
 import 'package:movie_app/widgets/bottom_app_bar.dart';
 import 'package:movie_app/Services/services.dart';
 import 'package:movie_app/Model/movie.dart';
@@ -25,19 +26,19 @@ class _MoviePageState extends State<MoviePage> {
       APIserver().getNowShowing();
   late final Future<List<Movie>> _comingSoonMovies =
       APIserver().getComingSoon();
- @override
+  @override
   void initState() {
     super.initState();
     // Dựa vào selectedCategory để xác định index của danh mục
     selectedIndex = categories.indexOf(widget.selectedCategory);
   }
-void changeCategory(String category) {
+
+  void changeCategory(String category) {
     setState(() {
       selectedIndex = categories.indexOf(category);
     });
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,100 +134,114 @@ void changeCategory(String category) {
                                   } else {
                                     final movieDetail =
                                         movieDetailSnapshot.data!;
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 8),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 270,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  "https://image.tmdb.org/t/p/original${movie1.posterPath}",
+                                    return GestureDetector(
+                                      onTap: () {
+                                        // Điều hướng tới trang chi tiết của phim
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                MovieDetailPage(
+                                                    movie: movieDetail),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 8),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              height: 270,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    "https://image.tmdb.org/t/p/original${movie1.posterPath}",
+                                                  ),
+                                                  fit: BoxFit.cover,
                                                 ),
-                                                fit: BoxFit.cover,
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(movie1.title,
-                                          maxLines: 2,
-                                              style: const TextStyle(
-                                                  color: Color(0xFFFCC434),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold)),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.star,
-                                                color: Colors.yellow,
-                                                size: 12,
-                                              ),
-                                              const SizedBox(
-                                                width: 3,
-                                              ),
-                                              Text(
-                                                movie1.voteAverage
-                                                    .toStringAsFixed(1),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(movie1.title,
+                                                maxLines: 2,
                                                 style: const TextStyle(
-                                                    fontSize: 12),
-                                              ),
-                                              const SizedBox(
-                                                width: 1,
-                                              ),
-                                              Text('(${movie1.voteCount})',
-                                                  style: const TextStyle(
-                                                      fontSize: 10)),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.access_time,
-                                                color: Colors.white,
-                                                size: 12,
-                                              ),
-                                              const SizedBox(
-                                                width: 3,
-                                              ),
-                                              Text(
-                                                formatRuntime(
-                                                    movieDetail.runtime),
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.white,
+                                                    color: Color(0xFFFCC434),
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.star,
+                                                  color: Colors.yellow,
+                                                  size: 12,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.videocam,
-                                                  size: 12),
-                                              const SizedBox(
-                                                width: 3,
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                    movie1.genres.join(', '),
+                                                const SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Text(
+                                                  movie1.voteAverage
+                                                      .toStringAsFixed(1),
+                                                  style: const TextStyle(
+                                                      fontSize: 12),
+                                                ),
+                                                const SizedBox(
+                                                  width: 1,
+                                                ),
+                                                Text('(${movie1.voteCount})',
                                                     style: const TextStyle(
-                                                        color: Colors.white70,
-                                                        fontSize: 12,
-                                                        overflow: TextOverflow
-                                                            .ellipsis)),
-                                              )
-                                            ],
-                                          ),
-                                        ],
+                                                        fontSize: 10)),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.access_time,
+                                                  color: Colors.white,
+                                                  size: 12,
+                                                ),
+                                                const SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Text(
+                                                  formatRuntime(
+                                                      movieDetail.runtime),
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.videocam,
+                                                    size: 12),
+                                                const SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                      movie1.genres.join(', '),
+                                                      style: const TextStyle(
+                                                          color: Colors.white70,
+                                                          fontSize: 12,
+                                                          overflow: TextOverflow
+                                                              .ellipsis)),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   }
@@ -257,107 +272,125 @@ void changeCategory(String category) {
                                         } else {
                                           final movieDetail =
                                               movieDetailSnapshot.data!;
-                                          return Container(
-                                            width: double.infinity,
-                                            margin: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 8),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  height: 270,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(
-                                                        "https://image.tmdb.org/t/p/original${movie2.posterPath}",
+                                          return GestureDetector(
+                                            onTap: () {
+                                              // Điều hướng tới trang chi tiết của phim
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MovieDetailPage(
+                                                          movie: movieDetail),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              width: double.infinity,
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 8),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    height: 270,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      image: DecorationImage(
+                                                        image: NetworkImage(
+                                                          "https://image.tmdb.org/t/p/original${movie2.posterPath}",
+                                                        ),
+                                                        fit: BoxFit.cover,
                                                       ),
-                                                      fit: BoxFit.cover,
                                                     ),
                                                   ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(movie2.title,
-                                                    style: const TextStyle(
-                                                        color:
-                                                            Color(0xFFFCC434),
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.star,
-                                                      color: Colors.yellow,
-                                                      size: 12,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 3,
-                                                    ),
-                                                    Text(
-                                                      movie2.voteAverage
-                                                          .toStringAsFixed(1),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(movie2.title,
                                                       style: const TextStyle(
-                                                          fontSize: 12),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 1,
-                                                    ),
-                                                    Text(
-                                                        '(${movie2.voteCount})',
-                                                        style: const TextStyle(
-                                                            fontSize: 10)),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.access_time,
-                                                      color: Colors.white,
-                                                      size: 12,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 3,
-                                                    ),
-                                                    Text(
-                                                      formatRuntime(
-                                                          movieDetail.runtime),
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.white,
+                                                          color:
+                                                              Color(0xFFFCC434),
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.star,
+                                                        color: Colors.yellow,
+                                                        size: 12,
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    const Icon(Icons.videocam,
-                                                        size: 12),
-                                                    const SizedBox(
-                                                      width: 3,
-                                                    ),
-                                                    Expanded(
-                                                      child: Text(
-                                                          movie2.genres
-                                                              .join(', '),
-                                                          style: const TextStyle(
-                                                              color: Colors
-                                                                  .white70,
-                                                              fontSize: 12,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis)),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
+                                                      const SizedBox(
+                                                        width: 3,
+                                                      ),
+                                                      Text(
+                                                        movie2.voteAverage
+                                                            .toStringAsFixed(1),
+                                                        style: const TextStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 1,
+                                                      ),
+                                                      Text(
+                                                          '(${movie2.voteCount})',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      10)),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.access_time,
+                                                        color: Colors.white,
+                                                        size: 12,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 3,
+                                                      ),
+                                                      Text(
+                                                        formatRuntime(
+                                                            movieDetail
+                                                                .runtime),
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.videocam,
+                                                          size: 12),
+                                                      const SizedBox(
+                                                        width: 3,
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                            movie2.genres
+                                                                .join(', '),
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .white70,
+                                                                fontSize: 12,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis)),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           );
                                         }

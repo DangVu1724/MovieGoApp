@@ -32,7 +32,7 @@ String formatDate(String date) {
 String formatRuntime(int runtime) {
   int hours = runtime ~/ 60;
   int minutes = runtime % 60;
-  return "${hours}h ${minutes}m";
+  return "${hours}h${minutes}m";
 }
 
 class _HomePageState extends State<HomePage> {
@@ -468,7 +468,7 @@ class ComingSoonMovies extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: comingSoon, // Lấy danh sách phim sắp chiếu
+      future: comingSoon, 
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -487,7 +487,7 @@ class ComingSoonMovies extends StatelessWidget {
         final movies = snapshot.data!;
 
         return SizedBox(
-          height: 300, // Chiều cao cố định cho danh sách
+          height: 300, 
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(left: 8),
@@ -511,68 +511,79 @@ class ComingSoonMovies extends StatelessWidget {
                     );
                   }
 
-                  return Container(
-                    width: 165, // Độ rộng cho mỗi item
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 230,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                "https://image.tmdb.org/t/p/original${movie.posterPath}",
+                  return GestureDetector(
+                    onTap: () {
+                    // Điều hướng tới trang chi tiết của phim
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailPage(movie: movie),
+                      ),
+                    );
+                  },
+                    child: Container(
+                      width: 165, // Độ rộng cho mỗi item
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 230,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  "https://image.tmdb.org/t/p/original${movie.posterPath}",
+                                ),
+                                fit: BoxFit.cover,
                               ),
-                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 7),
-                        // Tên phim
-                        Text(
-                          movie.title,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Row(
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.video,
-                              size: 12,
+                          const SizedBox(height: 7),
+                          // Tên phim
+                          Text(
+                            movie.title,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                movie.genres.join(", "),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Row(
+                            children: [
+                              const FaIcon(
+                                FontAwesomeIcons.video,
+                                size: 12,
+                              ),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  movie.genres.join(", "),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.calendar_month_outlined, size: 14),
-                            const SizedBox(width: 3),
-                            Text(
-                              formatDate(movie.releaseDate),
-                              style: const TextStyle(
-                                fontSize: 12,
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_month_outlined, size: 14),
+                              const SizedBox(width: 3),
+                              Text(
+                                formatDate(movie.releaseDate),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        // Hiển thị runtime dưới tên phim
-                      ],
+                            ],
+                          ),
+                          // Hiển thị runtime dưới tên phim
+                        ],
+                      ),
                     ),
                   );
                 },
