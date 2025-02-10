@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/main.dart';
-import 'package:movie_app/screens/homepage.dart';
-import 'package:movie_app/screens/movie.dart';
-import 'package:movie_app/screens/profile.dart';
-import 'package:movie_app/screens/ticket.dart';
+import 'package:moviego/screens/homepage.dart';
+import 'package:moviego/screens/movie.dart';
+import 'package:moviego/screens/profile.dart';
+import 'package:moviego/screens/ticket.dart';
+
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;

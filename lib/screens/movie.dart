@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/screens/homepage.dart';
-import 'package:movie_app/screens/moviedetails.dart';
-import 'package:movie_app/widgets/bottom_app_bar.dart';
-import 'package:movie_app/Services/services.dart';
-import 'package:movie_app/Model/movie.dart';
+import 'package:moviego/Model/movie.dart';
+import 'package:moviego/Services/services.dart';
+import 'package:moviego/screens/moviedetails.dart';
+
 
 class MoviePage extends StatefulWidget {
   final String selectedCategory;

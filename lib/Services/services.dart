@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
-import 'package:movie_app/Model/movie.dart';
+import 'package:moviego/Model/movie.dart';
 
 const baseUrl = 'https://api.themoviedb.org/3/';
 const apiKey = '27b1bcddbbc2b60c4ac18f9a69a36ecb';
@@ -284,11 +284,40 @@ class APIserver {
     // Kết hợp hai danh sách phim
     List<Movie> allMovies = nowPlayingMovies + comingSoonMovies;
 
-    // Lọc các phim có tên chứa từ khóa tìm kiếm
-    List<Movie> searchResults = allMovies.where((movie) {
-      return movie.title.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+    String normalizedQuery = query.toLowerCase();
 
-    return searchResults;
+  // Tách từ khóa
+  List<String> keywords = normalizedQuery.split(' ');
+
+  // Tìm kiếm các tiêu đề phim khớp với từ khóa
+  List<Movie> searchResults = allMovies.where((movie) {
+    String normalizedTitle = movie.title.toLowerCase();
+    return keywords.every((keyword) => normalizedTitle.contains(keyword));
+  }).toList();
+
+  // Sắp xếp kết quả:
+  searchResults.sort((a, b) {
+    String normalizedA = a.title.toLowerCase();
+    String normalizedB = b.title.toLowerCase();
+
+    // Ưu tiên khớp chính xác
+    if (normalizedA == normalizedQuery && normalizedB != normalizedQuery) {
+      return -1;
+    } else if (normalizedA != normalizedQuery && normalizedB == normalizedQuery) {
+      return 1;
+    }
+
+    // Ưu tiên tiêu đề bắt đầu bằng từ khóa
+    if (normalizedA.startsWith(normalizedQuery) && !normalizedB.startsWith(normalizedQuery)) {
+      return -1;
+    } else if (!normalizedA.startsWith(normalizedQuery) && normalizedB.startsWith(normalizedQuery)) {
+      return 1;
+    }
+
+    // Mặc định sắp xếp theo tên
+    return a.title.compareTo(b.title);
+  });
+
+  return searchResults;
   }
 }
