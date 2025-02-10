@@ -79,9 +79,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                 child: Padding(
                   padding:
                       const EdgeInsets.only(top: 180.0, left: 16, right: 16),
-                  child: Positioned(
-                    top: 100,
-                    child: Column(
+                  child:  Column(
                       children: [
                         Container(
                           // Nền mờ cho chữ
@@ -531,8 +529,8 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                           ],
                         ),
                       ],
-                    ),
-                  ),
+                    )
+                  
                 ),
               ),
               SafeArea(
