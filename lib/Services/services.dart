@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
-import 'package:movie_app/Model/movie.dart';
+import 'package:moviego/Model/movie.dart';
 
 const baseUrl = 'https://api.themoviedb.org/3/';
 const apiKey = '27b1bcddbbc2b60c4ac18f9a69a36ecb';

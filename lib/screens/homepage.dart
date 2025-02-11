@@ -5,13 +5,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:movie_app/Model/movie.dart';
-import 'package:movie_app/Services/services.dart';
+
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:movie_app/main.dart';
-import 'package:movie_app/screens/movie.dart';
-import 'package:movie_app/screens/moviedetails.dart';
-import 'package:movie_app/widgets/bottom_app_bar.dart';
+
+import 'package:moviego/Model/movie.dart';
+import 'package:moviego/Services/services.dart';
+import 'package:moviego/screens/moviedetails.dart';
+import 'package:moviego/widgets/bottom_app_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required void Function(int index) onTabChange});
@@ -740,43 +740,40 @@ class NowShowingMovies extends StatelessWidget {
                       ),
                   
                       // Hiển thị runtime dưới tiêu đề phim
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.access_time,
-                            color: Colors.white,
-                            size: 12,
-                          ),
-                          const SizedBox(
-                            width: 1,
-                          ),
-                          Text(
-                            formatRuntime(movieDetail.runtime),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          const Text(
-                            "•", // Dấu chấm tròn
-                            style: TextStyle(
-                              fontSize: 18, // Thay đổi kích thước dấu chấm
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          Text(
-                            movie.genres.join(', '),
-                            style: const TextStyle(fontSize: 12),
-                          )
-                        ],
-                      ),
+                      Center(
+  child: Row(
+    mainAxisSize: MainAxisSize.min, // Giới hạn kích thước theo nội dung
+    mainAxisAlignment: MainAxisAlignment.center, // Căn giữa ngang
+    crossAxisAlignment: CrossAxisAlignment.center, // Căn giữa dọc
+    children: [
+      const Icon(
+        Icons.access_time,
+        color: Colors.white,
+        size: 12,
+      ),
+      const SizedBox(width: 1),
+      Text(
+        formatRuntime(movieDetail.runtime),
+        style: const TextStyle(fontSize: 12, color: Colors.white),
+      ),
+      const SizedBox(width: 3),
+      const Text(
+        "•",
+        style: TextStyle(fontSize: 18, color: Colors.white),
+      ),
+      const SizedBox(width: 3),
+      Flexible( // Thay Expanded bằng Flexible để không ép toàn bộ không gian
+        child: Text(
+          movie.genres.join(', '),
+          style: const TextStyle(fontSize: 12),
+          overflow: TextOverflow.ellipsis, 
+          textAlign: TextAlign.center, // Căn giữa nội dung chữ
+        ),
+      ),
+    ],
+  ),
+),
+
                   
                       // Đánh giá phim
                       Container(
@@ -784,7 +781,7 @@ class NowShowingMovies extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.star, color: Colors.yellow),
+                            const Icon(Icons.star, color: Colors.yellow,size: 17,),
                             Text(
                               movie.voteAverage.toStringAsFixed(1),
                               style: const TextStyle(fontSize: 16),
@@ -807,7 +804,7 @@ class NowShowingMovies extends StatelessWidget {
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 3),
             enlargeCenterPage: true,
-            aspectRatio: 0.75,
+            aspectRatio: 0.66,
             scrollPhysics: const BouncingScrollPhysics(),
             enableInfiniteScroll: true,
           ),
