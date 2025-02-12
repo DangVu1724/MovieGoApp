@@ -8,6 +8,10 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        surfaceTintColor: Colors.black,
+        centerTitle: true,
         ),
     );
   }

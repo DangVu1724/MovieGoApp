@@ -1,24 +1,185 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:moviego/widgets/ticket_storage.dart';
 
 class TicketPage extends StatelessWidget {
-  // final String movieTitle;
-  // final String cinemaName;
-  // final int totalPrice;
-  // final List<String> selectedSeats;
-  // final String showTime;
-  // final DateTime showDate;
-  // final String moviePoster;
-  // final List<String> genres;
-
   const TicketPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My ticket",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+        title: const Text("My Ticket",style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),),
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        surfaceTintColor: Colors.black,
+        centerTitle: true,
       ),
-      // bottomNavigationBar: const CustomBottomNavBar(),
+      body: FutureBuilder<List<Map<String, String>>>(
+        future:
+            TicketStorage.getTickets(), // Lấy thông tin vé từ SharedPreferences
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+                child:
+                    CircularProgressIndicator()); // Hiển thị loading khi chưa lấy dữ liệu
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Bạn chưa có vé nào.',style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),));
+          }
+
+          final tickets = snapshot.data!;
+
+          return Container(
+            color: Colors.black,
+            child: ListView.builder(
+              itemCount: tickets.length,
+              itemBuilder: (context, index) {
+                final ticket = tickets[index];
+
+                // Kiểm tra dữ liệu tránh lỗi null
+                final movieTitle = ticket['movieTitle'] ?? 'Không có tiêu đề';
+                final cinemaName = ticket['cinemaName'] ?? 'Không có tên rạp';
+                final selectedSeats = ticket['selectedSeats'] ?? 'Không có ghế';
+                final showTime =
+                    ticket['showTime'] ?? 'Không có thời gian chiếu';
+                final showDate =
+                    ticket['showDate'] ?? 'Không có thời gian chiếu';
+                final totalPrice = ticket['totalPrice'] ?? 'Không có giá';
+                final moviePoster =
+                    ticket['moviePoster'] ?? ''; // Lấy poster từ dữ liệu ticket
+                final genres = ticket['genres']?.split(',') ??
+                    []; // Chuyển genres từ chuỗi thành danh sách nếu có
+
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8.0),
+                                bottomLeft: Radius.circular(8.0)),
+                            child: moviePoster.isNotEmpty
+                                ? Image.network(
+                                    "https://image.tmdb.org/t/p/original$moviePoster",
+                                    height: 150,
+                                    width: 120,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(
+                                    height: 150,
+                                    width: 120,
+                                    color: Colors
+                                        .grey), // Nếu không có ảnh thì hiển thị vùng trống
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 15),
+                                Text(
+                                  movieTitle,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFFFCC434)),
+                                  overflow: TextOverflow.fade,
+                                  softWrap: true,
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    const Text("🎬",
+                                        style: TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 5),
+                                    Expanded(
+                                      child: Text(
+                                        genres.join(', '),
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0xFFE6E6E6),
+                                            overflow: TextOverflow.ellipsis),
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  children: [
+                                    const Text("🍿",
+                                        style: TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      cinemaName,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFFE6E6E6)),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  children: [
+                                    const Text("🕒",
+                                        style: TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      DateFormat("dd.MM.yyyy")
+                                          .format(DateTime.parse(showDate)),
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFFE6E6E6)),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    const Text("•",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0xFFE6E6E6))),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      showTime,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFFE6E6E6)),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  children: [
+                                    const Text("💸",
+                                        style: TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      "$totalPrice VND",
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

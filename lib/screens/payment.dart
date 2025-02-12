@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:moviego/screens/ticket.dart';
 import 'package:moviego/widgets/bottom_app_bar.dart';
 import 'package:moviego/widgets/dialog_helper.dart';
+import 'package:moviego/widgets/ticket_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Payment extends StatefulWidget {
   final String movieTitle;
@@ -73,10 +75,49 @@ class _PaymentState extends State<Payment> {
       setState(() {
         discount = 0;
       });
-      DialogHelper.showCustomDialog(
-          context, "Mã giảm giá không hợp lệ!", "Mã giảm giá bạn nhập không đúng.");
+      DialogHelper.showCustomDialog(context, "Mã giảm giá không hợp lệ!",
+          "Mã giảm giá bạn nhập không đúng.");
     }
   }
+
+Future<void> savePaymentInfo({
+  required String movieTitle,
+  required String cinemaName,
+  required int totalPrice,
+  required List<String> selectedSeats,
+  required String showTime,
+  required DateTime showDate,
+  required String moviePoster,
+  required List<String> genres,
+}) async {
+  try {
+    // Chuyển danh sách seats và genres thành chuỗi để lưu vào SharedPreferences
+    String seats = selectedSeats.join(',');
+    String genresStr = genres.join(',');
+
+    // Tạo một map chứa thông tin vé thanh toán
+    Map<String, String> paymentInfo = {
+      'movieTitle': movieTitle,
+      'cinemaName': cinemaName,
+      'totalPrice': totalPrice.toString(),
+      'selectedSeats': seats,
+      'showTime': showTime,
+      'showDate': showDate.toIso8601String(),
+      'moviePoster': moviePoster,
+      'genres': genresStr,
+    };
+
+    // Lưu thông tin thanh toán vào danh sách vé trong TicketStorage
+    List<Map<String, String>> currentTickets = await TicketStorage.getTickets();  // Lấy danh sách vé hiện tại
+    currentTickets.add(paymentInfo);  // Thêm vé thanh toán mới vào danh sách
+    await TicketStorage.saveTickets(currentTickets);  // Lưu lại danh sách vé đã được cập nhật
+
+    print("Payment info saved successfully.");
+  } catch (e) {
+    print("Error saving payment info: $e");
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,11 +156,14 @@ class _PaymentState extends State<Payment> {
               Expanded(
                 child: Text(
                   content,
-                  style: const TextStyle(fontSize: 16,fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
                 ),
               ),
-              
-              const Icon(Icons.arrow_forward_ios,size: 18,)
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 18,
+              )
             ],
           ),
         ),
@@ -288,38 +332,49 @@ class _PaymentState extends State<Payment> {
                 height: 30,
               ),
               Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFCC434),
-                                borderRadius: BorderRadius.circular(13),
-                              ),
-                              child: TextButton(
-                                  onPressed: () {
-                                    
-                                    if (selectedPaymentMethod.isEmpty) {
-                                      DialogHelper.showCustomDialog(context, "Thông báo", "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                          const MainScreen(initialIndex: 1,),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration:
-                                              Duration.zero,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: const Text(
-                                    "Continue",
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  )),
-                            )
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFCC434),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: TextButton(
+                    onPressed: () {
+                      if (selectedPaymentMethod.isEmpty) {
+                        DialogHelper.showCustomDialog(context, "Thông báo",
+                            "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
+                      } else {
+                        // Lưu thông tin thanh toán
+                        savePaymentInfo(
+                          movieTitle: widget.movieTitle,
+                          cinemaName: widget.cinemaName,
+                          totalPrice: widget.totalPrice - discount,
+                          selectedSeats: widget.selectedSeats,
+                          showTime: widget.showTime,
+                          showDate: widget.showDate,
+                          moviePoster: widget.moviePoster,
+                          genres: widget.genres,
+                        );
+
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const MainScreen(initialIndex: 1,),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      "Continue",
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    )),
+              )
             ],
           ),
         ),
