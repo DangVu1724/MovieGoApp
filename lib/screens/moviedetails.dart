@@ -173,9 +173,11 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                               ),
                               child: TextButton(
                                   onPressed: () {
-                                    
                                     if (_selectedIndex == -1) {
-                                      DialogHelper.showCustomDialog(context, "Thông báo", "Vui lòng chọn rạp chiếu phim trước khi tiếp tục!");
+                                      DialogHelper.showCustomDialog(
+                                          context,
+                                          "Thông báo",
+                                          "Vui lòng chọn rạp chiếu phim trước khi tiếp tục!");
                                     } else {
                                       Navigator.push(
                                         context,
@@ -184,9 +186,16 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                                                   secondaryAnimation) =>
                                               SelectSeat(
                                             movieTitle: movieDetail.title,
+                                            movieRuntime: movieDetail.runtime,
                                             cinemaName:
                                                 cinemaList[_selectedIndex]
                                                     ["name"]!,
+                                            cinemaAddress:
+                                                cinemaList[_selectedIndex]
+                                                    ["address"]!,
+                                            cinemaImage:
+                                                cinemaList[_selectedIndex]
+                                                    ["image"]!,
                                             moviePoster: movieDetail.posterPath,
                                             genres: movieDetail.genres,
                                           ),

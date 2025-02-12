@@ -6,15 +6,18 @@ import 'package:moviego/widgets/dialog_helper.dart';
 class SelectSeat extends StatefulWidget {
   final String movieTitle;
   final String cinemaName;
+  final String cinemaAddress;
+  final String cinemaImage;
   final String moviePoster;
   final List<String> genres;
+  final int movieRuntime;
 
   const SelectSeat(
       {super.key,
       required this.movieTitle,
       required this.cinemaName,
       required this.moviePoster,
-      required this.genres});
+      required this.genres, required this.cinemaAddress, required this.cinemaImage, required this.movieRuntime});
 
   @override
   _SelectSeatState createState() => _SelectSeatState();
@@ -200,12 +203,15 @@ class _SelectSeatState extends State<SelectSeat> {
                                       Payment(
                                 movieTitle: widget.movieTitle,
                                 cinemaName: widget.cinemaName,
+                                cinemaAddress: widget.cinemaAddress,
+                                cinemaImage: widget.cinemaImage,
                                 selectedSeats: selectedSeatsList,
                                 showTime: availableTimes[selectedTimeIndex],
                                 totalPrice: caculatePrice(),
                                 showDate: selectedDate,
                                 moviePoster: widget.moviePoster,
                                 genres: widget.genres,
+                                movieRuntime: widget.movieRuntime
                               ),
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,

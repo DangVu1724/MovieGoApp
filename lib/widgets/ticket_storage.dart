@@ -42,4 +42,10 @@ class TicketStorage {
       print("Error adding ticket: $e");
     }
   }
+
+  static Future<void> clearSharedPreferences() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  print("Đã xóa toàn bộ dữ liệu trong SharedPreferences");
+}
 }

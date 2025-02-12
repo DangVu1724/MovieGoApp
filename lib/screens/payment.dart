@@ -12,12 +12,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Payment extends StatefulWidget {
   final String movieTitle;
   final String cinemaName;
+  final String cinemaAddress;
+  final String cinemaImage;
   final int totalPrice;
   final List<String> selectedSeats;
   final String showTime;
   final DateTime showDate;
   final String moviePoster;
   final List<String> genres;
+  final int movieRuntime;
 
   const Payment(
       {super.key,
@@ -28,7 +31,7 @@ class Payment extends StatefulWidget {
       required this.showDate,
       required this.totalPrice,
       required this.moviePoster,
-      required this.genres});
+      required this.genres, required this.cinemaAddress, required this.cinemaImage, required this.movieRuntime});
 
   @override
   State<Payment> createState() => _PaymentState();
@@ -41,9 +44,7 @@ class _PaymentState extends State<Payment> {
   int discount = 0;
   late String orderID = '';
 
-  //  String generateID() {
-  //   return DateTime.now().millisecondsSinceEpoch.toString();  // Dùng thời gian để tạo ID duy nhất
-  // }
+
 
   String generateID() {
     Random random = Random();
@@ -80,22 +81,36 @@ class _PaymentState extends State<Payment> {
     }
   }
 
+  Future<void> clearSharedPreferences() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  print("Đã xóa toàn bộ dữ liệu trong SharedPreferences");
+}
+
 Future<void> savePaymentInfo({
   required String movieTitle,
   required String cinemaName,
+  required String cinemaAddress,
+  required String cinemaImage,
   required int totalPrice,
   required List<String> selectedSeats,
   required String showTime,
   required DateTime showDate,
   required String moviePoster,
   required List<String> genres,
+  required String orderID,
+  required int movieRuntime
 }) async {
   try {
     // Chuyển danh sách seats và genres thành chuỗi để lưu vào SharedPreferences
     String seats = selectedSeats.join(',');
     String genresStr = genres.join(',');
+     int hours = movieRuntime ~/ 60;
+      int minutes = movieRuntime % 60;
+    String movieRuntimeStr = "$hours hour $minutes minutes";
 
-    // Tạo một map chứa thông tin vé thanh toán
+    
+
     Map<String, String> paymentInfo = {
       'movieTitle': movieTitle,
       'cinemaName': cinemaName,
@@ -105,7 +120,13 @@ Future<void> savePaymentInfo({
       'showDate': showDate.toIso8601String(),
       'moviePoster': moviePoster,
       'genres': genresStr,
+      'orderID' : orderID,
+      'cinemaAddress' : cinemaAddress,
+      'cinemaImage' : cinemaImage,
+      'movieRuntime' : movieRuntimeStr
     };
+    
+
 
     // Lưu thông tin thanh toán vào danh sách vé trong TicketStorage
     List<Map<String, String>> currentTickets = await TicketStorage.getTickets();  // Lấy danh sách vé hiện tại
@@ -183,12 +204,14 @@ Future<void> savePaymentInfo({
       ),
       body: SingleChildScrollView(
         child: Padding(
+          
           padding: const EdgeInsets.only(top: 8.0, right: 16, left: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               buildInforMovie(),
+
               const SizedBox(
                 height: 30,
               ),
@@ -331,6 +354,16 @@ Future<void> savePaymentInfo({
               const SizedBox(
                 height: 30,
               ),
+//               ElevatedButton(
+//   onPressed: () async {
+//     await clearSharedPreferences(); // Gọi phương thức để xóa SharedPreferences
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Dữ liệu đã được xóa khỏi SharedPreferences"))
+//     );
+//   },
+//   child: Text("Clear SharedPreferences"),
+// ),
+
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -343,7 +376,7 @@ Future<void> savePaymentInfo({
                         DialogHelper.showCustomDialog(context, "Thông báo",
                             "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
                       } else {
-                        // Lưu thông tin thanh toán
+                        print(orderID);
                         savePaymentInfo(
                           movieTitle: widget.movieTitle,
                           cinemaName: widget.cinemaName,
@@ -353,6 +386,9 @@ Future<void> savePaymentInfo({
                           showDate: widget.showDate,
                           moviePoster: widget.moviePoster,
                           genres: widget.genres,
+                          orderID: orderID, cinemaAddress: widget.cinemaAddress,
+                          cinemaImage: widget.cinemaImage,
+                          movieRuntime: widget.movieRuntime
                         );
 
                         Navigator.push(
