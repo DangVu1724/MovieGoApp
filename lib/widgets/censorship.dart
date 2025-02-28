@@ -43,7 +43,27 @@ class Censorship extends StatelessWidget {
             ],
           );
         } else {
-          return const Center(child: Text('No data available'));
+          return const Row(
+            children: [
+              Text(
+                "Censorship:",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFFCDCDCD),
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Text(
+                "No certification ",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          );
         }
       },
     );

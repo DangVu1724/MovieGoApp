@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:moviego/screens/homepage.dart';
 import 'package:moviego/screens/ticket_detail.dart';
 
 class TicketPage extends StatelessWidget {
@@ -92,7 +93,7 @@ class TicketPage extends StatelessWidget {
                                   key,
                                   value.join(
                                       ', ')); // 🔥 Chuyển List thành chuỗi
-                            } else {
+                            }  else {
                               return MapEntry(key, value.toString());
                             }
                           });
@@ -140,7 +141,7 @@ class TicketPage extends StatelessWidget {
                                   Text(
                                     movieTitle,
                                     style: const TextStyle(
-                                        fontSize: 21,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.w700,
                                         color: Color(0xFFFCC434)),
                                     overflow: TextOverflow.fade,
@@ -150,13 +151,13 @@ class TicketPage extends StatelessWidget {
                                   Row(
                                     children: [
                                       const Text("🎬",
-                                          style: TextStyle(fontSize: 14)),
+                                          style: TextStyle(fontSize: 10)),
                                       const SizedBox(width: 5),
                                       Expanded(
                                         child: Text(
                                           genres.join(', '),
                                           style: const TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 12,
                                               color: Color(0xFFE6E6E6),
                                               overflow: TextOverflow.ellipsis),
                                           maxLines: 1,
@@ -168,12 +169,12 @@ class TicketPage extends StatelessWidget {
                                   Row(
                                     children: [
                                       const Text("🍿",
-                                          style: TextStyle(fontSize: 14)),
+                                          style: TextStyle(fontSize: 10)),
                                       const SizedBox(width: 5),
                                       Text(
                                         cinemaName,
                                         style: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 12,
                                             color: Color(0xFFE6E6E6)),
                                       ),
                                     ],
@@ -182,12 +183,12 @@ class TicketPage extends StatelessWidget {
                                   Row(
                                     children: [
                                       const Text("💸",
-                                          style: TextStyle(fontSize: 14)),
+                                          style: TextStyle(fontSize: 10)),
                                       const SizedBox(width: 5),
                                       Text(
                                         "${NumberFormat('#,###', 'vi_VN').format(int.parse(totalPrice))} VND",
                                         style: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ],

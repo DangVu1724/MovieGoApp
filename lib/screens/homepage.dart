@@ -93,11 +93,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Hàm xử lý khi kéo để làm mới
   Future<void> _onRefresh() async {
-    _loadData(); // Tải lại dữ liệu khi kéo làm mới
-    await Future.wait([nowShowing, comingSoon]); // Đợi dữ liệu tải xong
+  try {
+    _loadData();
+    await Future.wait([nowShowing, comingSoon]);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Failed to refresh data: $e")),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -105,33 +110,37 @@ class _HomePageState extends State<HomePage> {
       appBar: buildAppBar(userName),
       body: Container(
         color: Colors.black,
-        child: SingleChildScrollView(
-          
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: <Widget>[
-              const SearchBar(),
-              const SizedBox(height: 20),
-              const NowShowingHeader(),
-              const SizedBox(
-                height: 15,
-              ),
-              NowShowingMovies(nowShowing: nowShowing),
-              const ComingSoonHeader(),
-              const SizedBox(height: 15),
-              ComingSoonMovies(comingSoon: comingSoon),
-              const SizedBox(height: 15),
-              const PromoDiscountHeader(),
-              const SizedBox(height: 5),
-              const PromoDiscount(),
-              const ServiceHeader(),
-              const SizedBox(height: 5),
-              const ServiceWidget(),
-              const SizedBox(height: 10),
-              const MovieNewsHeader(),
-              const SizedBox(height: 5),
-              MovieNewsWidget(movieNews: movieNews)
-            ],
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          color: Colors.yellow,
+          child: SingleChildScrollView(
+            
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: <Widget>[
+                const SearchBar(),
+                const SizedBox(height: 20),
+                const NowShowingHeader(),
+                const SizedBox(
+                  height: 15,
+                ),
+                NowShowingMovies(nowShowing: nowShowing),
+                const ComingSoonHeader(),
+                const SizedBox(height: 15),
+                ComingSoonMovies(comingSoon: comingSoon),
+                const SizedBox(height: 15),
+                const PromoDiscountHeader(),
+                const SizedBox(height: 5),
+                const PromoDiscount(),
+                const ServiceHeader(),
+                const SizedBox(height: 5),
+                const ServiceWidget(),
+                const SizedBox(height: 10),
+                const MovieNewsHeader(),
+                const SizedBox(height: 5),
+                MovieNewsWidget(movieNews: movieNews)
+              ],
+            ),
           ),
         ),
       ),
