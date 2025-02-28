@@ -38,146 +38,14 @@ class TicketDetail extends StatelessWidget {
           ),
           Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 50, right: 50, top: 120),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: moviePoster.isNotEmpty
-                          ? Image.network(
-                              "https://image.tmdb.org/t/p/original$moviePoster",
-                              height: 170,
-                              width: 120,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              height: 170,
-                              width: 120,
-                              color: Colors.grey,
-                            ),
-                    ),
-                    const SizedBox(width: 25),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 15),
-                          Text(
-                            movieTitle,
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black),
-                            overflow: TextOverflow.fade,
-                            softWrap: true,
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            children: [
-                              const Text("🎬", style: TextStyle(fontSize: 14)),
-                              const SizedBox(width: 5),
-                              Expanded(
-                                child: Text(
-                                  genres.join(', '),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      overflow: TextOverflow.ellipsis),
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        
-                          const SizedBox(height: 3),
-                          Row(
-                            children: [
-                              const Text("🕒", style: TextStyle(fontSize: 14)),
-                              const SizedBox(width: 5),
-                              Text(
-                                movieRuntime,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black),
-                              ),                             
-                            ],
-                          ),
-                          const SizedBox(height: 3),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              inforMovie(moviePoster: moviePoster, movieTitle: movieTitle, genres: genres, movieRuntime: movieRuntime),
               Padding(
                 padding: const EdgeInsets.only(left: 50, right: 50, top: 30),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Image.asset("assets/images/calendar.png"),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              showTime,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              DateFormat("dd.MM.yyyy")
-                                  .format(DateTime.parse(showDate)),
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Image.asset("assets/images/seat_cinema.png"),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Section 4",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(
-                              height: 2,
-                            ),
-                            Text(selectedSeats.join(', '),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold)),
-                          ],
-                        )
-                      ],
-                    )
+                    calender(showTime: showTime, showDate: showDate),
+                    seat(selectedSeats: selectedSeats)
                   ],
                 ),
               ),
@@ -189,77 +57,7 @@ class TicketDetail extends StatelessWidget {
                   thickness: 0.7,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 50, right: 50, top: 20),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Text("💸", style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 10),
-                        Text(
-                          "${NumberFormat('#,###', 'vi_VN').format(int.parse(totalPrice))} VND",
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                        
-                      ],
-                    ),
-                    const SizedBox(height:5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("🍿", style: TextStyle(fontSize: 14)),
-                              const SizedBox(width: 10),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  
-                                  Row(
-                                    children: [
-                                      Text(
-                                        cinemaName,
-                                        style: const TextStyle(
-                                            fontSize: 16, color: Colors.black,fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(width: 20,),
-                                      
-                                      Image.asset(cinemaImage),
-                                    ],
-                                  ),
-                                  Text(cinemaAddress,style: const TextStyle(
-                                    fontSize: 14, color: Colors.black,fontWeight: FontWeight.w500
-                                  ),)
-                                ],
-                                
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height:5),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("📢", style: TextStyle(fontSize: 14)),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  "Show this QR code to the ticket counter to receive your ticket",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black,fontWeight: FontWeight.w500),
-                                      softWrap: true,
-                                ),
-                              ),
-                              
-                            ],
-                          ),
-                  ],
-                ),
-              ),
+              inforTicket(totalPrice: totalPrice, cinemaName: cinemaName, cinemaImage: cinemaImage, cinemaAddress: cinemaAddress),
               Padding(
                 padding: const EdgeInsets.only(right: 12.0,left: 12),
                 child: Row(
@@ -301,6 +99,278 @@ class TicketDetail extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class inforTicket extends StatelessWidget {
+  const inforTicket({
+    super.key,
+    required this.totalPrice,
+    required this.cinemaName,
+    required this.cinemaImage,
+    required this.cinemaAddress,
+  });
+
+  final String totalPrice;
+  final String cinemaName;
+  final String cinemaImage;
+  final String cinemaAddress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 50, right: 50, top: 20),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text("💸", style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 10),
+              Text(
+                "${NumberFormat('#,###', 'vi_VN').format(int.parse(totalPrice))} VND",
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              
+            ],
+          ),
+          const SizedBox(height:5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("🍿", style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 10),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        
+                        Row(
+                          children: [
+                            Text(
+                              cinemaName,
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black,fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 20,),
+                            
+                            Image.asset(cinemaImage),
+                          ],
+                        ),
+                        Text(cinemaAddress,style: const TextStyle(
+                          fontSize: 14, color: Colors.black,fontWeight: FontWeight.w500
+                        ),)
+                      ],
+                      
+                    ),
+                  ],
+                ),
+                const SizedBox(height:5),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("📢", style: TextStyle(fontSize: 14)),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Show this QR code to the ticket counter to receive your ticket",
+                        style: TextStyle(
+                            fontSize: 16, color: Colors.black,fontWeight: FontWeight.w500),
+                            softWrap: true,
+                      ),
+                    ),
+                    
+                  ],
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+class inforMovie extends StatelessWidget {
+  const inforMovie({
+    super.key,
+    required this.moviePoster,
+    required this.movieTitle,
+    required this.genres,
+    required this.movieRuntime,
+  });
+
+  final String moviePoster;
+  final String movieTitle;
+  final List<String> genres;
+  final String movieRuntime;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 50, right: 50, top: 120),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: moviePoster.isNotEmpty
+                ? Image.network(
+                    "https://image.tmdb.org/t/p/original$moviePoster",
+                    height: 170,
+                    width: 120,
+                    fit: BoxFit.cover,
+                  )
+                : Container(
+                    height: 170,
+                    width: 120,
+                    color: Colors.grey,
+                  ),
+          ),
+          const SizedBox(width: 25),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 15),
+                Text(
+                  movieTitle,
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black),
+                  overflow: TextOverflow.fade,
+                  softWrap: true,
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  children: [
+                    const Text("🎬", style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        genres.join(', '),
+                        style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                            overflow: TextOverflow.ellipsis),
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    const Text("🕒", style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 5),
+                    Text(
+                      movieRuntime,
+                      style: const TextStyle(
+                          fontSize: 14, color: Colors.black),
+                    ),                             
+                  ],
+                ),
+                const SizedBox(height: 3),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class seat extends StatelessWidget {
+  const seat({
+    super.key,
+    required this.selectedSeats,
+  });
+
+  final List<String> selectedSeats;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Image.asset("assets/images/seat_cinema.png"),
+        const SizedBox(
+          width: 10,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Section 4",
+              style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 2,
+            ),
+            Text(selectedSeats.join(', '),
+                style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold)),
+          ],
+        )
+      ],
+    );
+  }
+}
+
+class calender extends StatelessWidget {
+  const calender({
+    super.key,
+    required this.showTime,
+    required this.showDate,
+  });
+
+  final String showTime;
+  final String showDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Image.asset("assets/images/calendar.png"),
+        const SizedBox(
+          width: 10,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              showTime,
+              style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 2,
+            ),
+            Text(
+              DateFormat("dd.MM.yyyy")
+                  .format(DateTime.parse(showDate)),
+              style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        )
+      ],
     );
   }
 }

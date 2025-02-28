@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:intl/intl.dart';
@@ -87,57 +89,76 @@ class _PaymentState extends State<Payment> {
   print("Đã xóa toàn bộ dữ liệu trong SharedPreferences");
 }
 
-Future<void> savePaymentInfo({
+Future<void> saveBookedSeats(List<String> selectedSeats) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setStringList('bookedSeats', selectedSeats);
+  print("Booked seats saved successfully.");
+}
+
+Future<void> savePaymentInfoToFirebase({
   required String movieTitle,
   required String cinemaName,
-  required String cinemaAddress,
-  required String cinemaImage,
-  required int totalPrice,
   required List<String> selectedSeats,
+  required int totalPrice,
   required String showTime,
   required DateTime showDate,
-  required String moviePoster,
-  required List<String> genres,
-  required String orderID,
-  required int movieRuntime
 }) async {
   try {
-    // Chuyển danh sách seats và genres thành chuỗi để lưu vào SharedPreferences
-    String seats = selectedSeats.join(',');
-    String genresStr = genres.join(',');
-     int hours = movieRuntime ~/ 60;
-      int minutes = movieRuntime % 60;
-    String movieRuntimeStr = "$hours hour $minutes minutes";
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print("Người dùng chưa đăng nhập!");
+      return;
+    }
 
-    
+    // Sử dụng orderID đã tạo trong class thay vì tạo mới
+    String orderId = orderID;
 
-    Map<String, String> paymentInfo = {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('tickets')
+        .doc(orderId)
+        .set({
+      'orderID': orderId, // Thêm orderID để sử dụng trong TicketPage
       'movieTitle': movieTitle,
       'cinemaName': cinemaName,
-      'totalPrice': totalPrice.toString(),
-      'selectedSeats': seats,
+      'cinemaAddress': widget.cinemaAddress, // Thêm thông tin bổ sung
+      'cinemaImage': widget.cinemaImage,
+      'selectedSeats': selectedSeats,
+      'totalPrice': totalPrice,
       'showTime': showTime,
-      'showDate': showDate.toIso8601String(),
-      'moviePoster': moviePoster,
-      'genres': genresStr,
-      'orderID' : orderID,
-      'cinemaAddress' : cinemaAddress,
-      'cinemaImage' : cinemaImage,
-      'movieRuntime' : movieRuntimeStr
-    };
-    
+      'showDate': DateFormat('yyyy-MM-dd').format(showDate),
+      'moviePoster': widget.moviePoster,
+      'genres': widget.genres,
+      'movieRuntime': widget.movieRuntime,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
 
+    print("Vé đã được lưu vào Firebase với orderID: $orderId");
 
-    // Lưu thông tin thanh toán vào danh sách vé trong TicketStorage
-    List<Map<String, String>> currentTickets = await TicketStorage.getTickets();  // Lấy danh sách vé hiện tại
-    currentTickets.add(paymentInfo);  // Thêm vé thanh toán mới vào danh sách
-    await TicketStorage.saveTickets(currentTickets);  // Lưu lại danh sách vé đã được cập nhật
+    // Lưu ghế đã đặt vào SharedPreferences (nếu cần)
+    await saveBookedSeats(selectedSeats);
 
-    print("Payment info saved successfully.");
+    // Chuyển sang trang Ticket ngay sau khi lưu thành công
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainScreen(initialIndex: 1,),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
   } catch (e) {
-    print("Error saving payment info: $e");
+    print("Lỗi khi lưu vé: $e");
+    DialogHelper.showCustomDialog(
+        context, "Lỗi", "Không thể lưu vé, vui lòng thử lại!");
   }
 }
+
+
+
+
 
 
   @override
@@ -349,21 +370,11 @@ Future<void> savePaymentInfo({
                 height: 8,
               ),
               buildPaymentMethod(
-                  image: "assets/images/ATM.png",
+                  image: "assets/images/Visa.png",
                   content: "International payments"),
               const SizedBox(
                 height: 30,
               ),
-//               ElevatedButton(
-//   onPressed: () async {
-//     await clearSharedPreferences(); // Gọi phương thức để xóa SharedPreferences
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text("Dữ liệu đã được xóa khỏi SharedPreferences"))
-//     );
-//   },
-//   child: Text("Clear SharedPreferences"),
-// ),
-
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -377,18 +388,13 @@ Future<void> savePaymentInfo({
                             "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
                       } else {
                         print(orderID);
-                        savePaymentInfo(
+                        savePaymentInfoToFirebase(
                           movieTitle: widget.movieTitle,
                           cinemaName: widget.cinemaName,
                           totalPrice: widget.totalPrice - discount,
                           selectedSeats: widget.selectedSeats,
                           showTime: widget.showTime,
                           showDate: widget.showDate,
-                          moviePoster: widget.moviePoster,
-                          genres: widget.genres,
-                          orderID: orderID, cinemaAddress: widget.cinemaAddress,
-                          cinemaImage: widget.cinemaImage,
-                          movieRuntime: widget.movieRuntime
                         );
 
                         Navigator.push(

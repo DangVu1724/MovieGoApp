@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moviego/screens/payment.dart';
 import 'package:moviego/widgets/dialog_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectSeat extends StatefulWidget {
   final String movieTitle;
@@ -73,14 +74,25 @@ class _SelectSeatState extends State<SelectSeat> {
     print("Selected Seats: $selectedSeatsList");
   }
 
-  @override
-  void initState() {
-    super.initState();
-    selectedSeats = List.generate(rows, (i) => List.filled(cols, false));
-    bookedSeats[0][1] = true;
-    bookedSeats[1][3] = true;
-    bookedSeats[3][2] = true;
-  }
+  Future<List<String>> loadBookedSeats() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getStringList('bookedSeats') ?? [];
+}
+
+ @override
+void initState() {
+  super.initState();
+  selectedSeats = List.generate(rows, (i) => List.filled(cols, false));
+  loadBookedSeats().then((bookedSeatsList) {
+    setState(() {
+      for (String seat in bookedSeatsList) {
+        int row = seat.codeUnitAt(0) - 65; 
+        int col = int.parse(seat.substring(1)) - 1; 
+        bookedSeats[row][col] = true;
+      }
+    });
+  });
+}
 
   void toggleSeat(int row, int col) {
     if (!bookedSeats[row][col]) {
@@ -250,52 +262,52 @@ class _SelectSeatState extends State<SelectSeat> {
   }
 
   GridView buildSeats() {
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 12,
-        childAspectRatio: 0.9,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-      ),
-      itemCount: rows * cols,
-      itemBuilder: (context, index) {
-        int row = index ~/ cols;
-        int col = index % cols;
-        bool isSelected = selectedSeats[row][col];
-        bool isBooked = bookedSeats[row][col];
+  return GridView.builder(
+    physics: const NeverScrollableScrollPhysics(),
+    padding: const EdgeInsets.symmetric(vertical: 10),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 12,
+      childAspectRatio: 0.9,
+      crossAxisSpacing: 4,
+      mainAxisSpacing: 4,
+    ),
+    itemCount: rows * cols,
+    itemBuilder: (context, index) {
+      int row = index ~/ cols;
+      int col = index % cols;
+      bool isSelected = selectedSeats[row][col];
+      bool isBooked = bookedSeats[row][col];
 
-        return GestureDetector(
-          onTap: () => toggleSeat(row, col),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isBooked
-                  ? const Color(0xFF261D08)
-                  : isSelected
-                      ? const Color(0xFFFCC434)
-                      : const Color(0xFF1C1C1C),
-              borderRadius: BorderRadius.circular(4.0),
-            ),
-            child: Center(
-              child: Text(
-                getSeatLabel(row, col),
-                style: TextStyle(
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                  color: isBooked
-                      ? const Color(0xFFFCC434)
-                      : isSelected
-                          ? Colors.black
-                          : Colors.white,
-                  fontSize: 12,
-                ),
+      return GestureDetector(
+        onTap: () => toggleSeat(row, col),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isBooked
+                ? const Color(0xFF261D08)
+                : isSelected
+                    ? const Color(0xFFFCC434)
+                    : const Color(0xFF1C1C1C),
+            borderRadius: BorderRadius.circular(4.0),
+          ),
+          child: Center(
+            child: Text(
+              getSeatLabel(row, col),
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                color: isBooked
+                    ? const Color(0xFFFCC434)
+                    : isSelected
+                        ? Colors.black
+                        : Colors.white,
+                fontSize: 12,
               ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   GestureDetector buildDateWidget(DateTime date) {
     return GestureDetector(
