@@ -4,6 +4,7 @@ import 'package:moviego/Model/movie.dart';
 import 'package:moviego/Services/services.dart';
 import 'package:moviego/screens/homepage.dart';
 import 'package:moviego/screens/moviedetails.dart';
+import 'package:moviego/controllers/home_controller.dart';
 
 class ComingSoonMovies extends StatelessWidget {
   const ComingSoonMovies({

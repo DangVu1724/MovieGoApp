@@ -144,13 +144,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      // bottomNavigationBar: Container(
-      //     padding: const EdgeInsets.all(0),
-      //     decoration: const BoxDecoration(
-      //         border: Border(
-      //       top: BorderSide(color: Color(0xFF262626)),
-      //     )),
-      //     child: const CustomBottomNavBar()),
     );
   }
 
