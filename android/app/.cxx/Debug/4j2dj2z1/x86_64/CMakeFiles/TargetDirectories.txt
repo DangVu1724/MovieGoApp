@@ -1,2 +1,0 @@
-C:/Personal/Moblie/flutter_subject/moviego/android/app/.cxx/Debug/4j2dj2z1/x86_64/CMakeFiles/edit_cache.dir
-C:/Personal/Moblie/flutter_subject/moviego/android/app/.cxx/Debug/4j2dj2z1/x86_64/CMakeFiles/rebuild_cache.dir

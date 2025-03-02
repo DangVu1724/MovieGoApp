@@ -31,6 +31,7 @@ migrate_working_dir/
 .pub/
 /build/
 android/.settings/
+android/app/.cxx/
 
 # Symbolication related
 app.*.symbols
