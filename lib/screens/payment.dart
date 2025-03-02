@@ -1,13 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:intl/intl.dart';
-import 'package:moviego/screens/ticket.dart';
+import 'package:moviego/controllers/payment_controller.dart'; // Import Controller
 import 'package:moviego/widgets/bottom_app_bar.dart';
 import 'package:moviego/widgets/dialog_helper.dart';
-import 'package:moviego/widgets/ticket_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Payment extends StatefulWidget {
   final String movieTitle;
@@ -22,169 +17,76 @@ class Payment extends StatefulWidget {
   final List<String> genres;
   final int movieRuntime;
 
-  const Payment(
-      {super.key,
-      required this.movieTitle,
-      required this.cinemaName,
-      required this.selectedSeats,
-      required this.showTime,
-      required this.showDate,
-      required this.totalPrice,
-      required this.moviePoster,
-      required this.genres, required this.cinemaAddress, required this.cinemaImage, required this.movieRuntime});
+  const Payment({
+    super.key,
+    required this.movieTitle,
+    required this.cinemaName,
+    required this.selectedSeats,
+    required this.showTime,
+    required this.showDate,
+    required this.totalPrice,
+    required this.moviePoster,
+    required this.genres,
+    required this.cinemaAddress,
+    required this.cinemaImage,
+    required this.movieRuntime,
+  });
 
   @override
   State<Payment> createState() => _PaymentState();
 }
 
 class _PaymentState extends State<Payment> {
-  String selectedPaymentMethod = '';
-  TextEditingController controller = TextEditingController();
-  List<String> discountCode = ['moviego', 'phenikaa'];
-  int discount = 0;
-  late String orderID = '';
-
-
-
-  String generateID() {
-    Random random = Random();
-    for (int i = 0; i < 11; i++) {
-      orderID += random.nextInt(10).toString();
-    }
-    return orderID;
-  }
+  late PaymentController _controller;
 
   @override
   void initState() {
     super.initState();
-    orderID = generateID();
+    _controller = PaymentController(
+      movieTitle: widget.movieTitle,
+      cinemaName: widget.cinemaName,
+      cinemaAddress: widget.cinemaAddress,
+      cinemaImage: widget.cinemaImage,
+      totalPrice: widget.totalPrice,
+      selectedSeats: widget.selectedSeats,
+      showTime: widget.showTime,
+      showDate: widget.showDate,
+      moviePoster: widget.moviePoster,
+      genres: widget.genres,
+      movieRuntime: widget.movieRuntime,
+    );
   }
 
-  void applyDiscount() {
-    String enteredCode = controller.text.trim();
-
-    if (discountCode.contains(enteredCode)) {
-      setState(() {
-        discount = 50000;
-      });
-
-      // Hiển thị hộp thoại khi mã giảm giá hợp lệ
-
-      DialogHelper.showCustomDialog(
-          context, "Mã giảm giá hợp lệ!", "Giảm 50k cho đơn hàng của bạn.");
-    } else {
-      setState(() {
-        discount = 0;
-      });
-      DialogHelper.showCustomDialog(context, "Mã giảm giá không hợp lệ!",
-          "Mã giảm giá bạn nhập không đúng.");
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
-
-  Future<void> clearSharedPreferences() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-  print("Đã xóa toàn bộ dữ liệu trong SharedPreferences");
-}
-
-Future<void> savePaymentInfo({
-  required String movieTitle,
-  required String cinemaName,
-  required String cinemaAddress,
-  required String cinemaImage,
-  required int totalPrice,
-  required List<String> selectedSeats,
-  required String showTime,
-  required DateTime showDate,
-  required String moviePoster,
-  required List<String> genres,
-  required String orderID,
-  required int movieRuntime
-}) async {
-  try {
-    // Chuyển danh sách seats và genres thành chuỗi để lưu vào SharedPreferences
-    String seats = selectedSeats.join(',');
-    String genresStr = genres.join(',');
-     int hours = movieRuntime ~/ 60;
-      int minutes = movieRuntime % 60;
-    String movieRuntimeStr = "$hours hour $minutes minutes";
-
-    
-
-    Map<String, String> paymentInfo = {
-      'movieTitle': movieTitle,
-      'cinemaName': cinemaName,
-      'totalPrice': totalPrice.toString(),
-      'selectedSeats': seats,
-      'showTime': showTime,
-      'showDate': showDate.toIso8601String(),
-      'moviePoster': moviePoster,
-      'genres': genresStr,
-      'orderID' : orderID,
-      'cinemaAddress' : cinemaAddress,
-      'cinemaImage' : cinemaImage,
-      'movieRuntime' : movieRuntimeStr
-    };
-    
-
-
-    // Lưu thông tin thanh toán vào danh sách vé trong TicketStorage
-    List<Map<String, String>> currentTickets = await TicketStorage.getTickets();  // Lấy danh sách vé hiện tại
-    currentTickets.add(paymentInfo);  // Thêm vé thanh toán mới vào danh sách
-    await TicketStorage.saveTickets(currentTickets);  // Lưu lại danh sách vé đã được cập nhật
-
-    print("Payment info saved successfully.");
-  } catch (e) {
-    print("Error saving payment info: $e");
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
-    GestureDetector buildPaymentMethod(
-        {required String image, required String content}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    GestureDetector buildPaymentMethod({required String image, required String content}) {
       return GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedPaymentMethod = content;
-          });
-          print('Phương thức thanh toán đã chọn: $selectedPaymentMethod');
-        },
+        onTap: () => _controller.selectPaymentMethod(content, setState),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(screenWidth * 0.04),
           decoration: BoxDecoration(
-            color: selectedPaymentMethod == content
-                ? const Color(0xFF261D08)
-                : const Color(0xFF1C1C1C),
-            borderRadius: BorderRadius.circular(10),
-            border: selectedPaymentMethod == content
-                ? Border.all(color: const Color(0xFFFCC434))
-                : null,
+            color: _controller.selectedPaymentMethod == content ? const Color(0xFF261D08) : const Color(0xFF1C1C1C),
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
+            border: _controller.selectedPaymentMethod == content ? Border.all(color: const Color(0xFFFCC434)) : null,
           ),
           child: Row(
             children: [
               Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Image.asset(
-                  image,
-                  fit: BoxFit.cover,
-                ),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(screenWidth * 0.02)),
+                child: Image.asset(image, fit: BoxFit.cover, width: screenWidth * 0.1),
               ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Text(
-                  content,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 18,
-              )
+              SizedBox(width: screenWidth * 0.04),
+              Expanded(child: Text(content, style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500, color: Colors.white))),
+              const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.white),
             ],
           ),
         ),
@@ -194,223 +96,125 @@ Future<void> savePaymentInfo({
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          "Payment",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
+        title: const Text("Payment", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
         centerTitle: true,
         surfaceTintColor: Colors.black,
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          
-          padding: const EdgeInsets.only(top: 8.0, right: 16, left: 16),
+          padding: EdgeInsets.only(top: screenHeight * 0.01, right: screenWidth * 0.04, left: screenWidth * 0.04),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               buildInforMovie(),
-
-              const SizedBox(
-                height: 30,
-              ),
+              SizedBox(height: screenHeight * 0.03),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Order ID",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    orderID,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  )
+                  Text("Order ID", style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.white)),
+                  Text(_controller.orderID, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.white)),
                 ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: screenHeight * 0.015),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Seat",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Text(widget.selectedSeats.join(', '),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text("Seat", style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.white)),
+                  Text(widget.selectedSeats.join(', '), style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.white)),
                 ],
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              SizedBox(height: screenHeight * 0.02),
               Container(
-                decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1C),
-                    borderRadius: BorderRadius.circular(12)),
-                child: Row(children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.local_offer_rounded,
-                            color: Color(0xFFFCC434),
-                          ),
+                decoration: BoxDecoration(color: const Color(0xFF1C1C1C), borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.local_offer_rounded, color: Color(0xFFFCC434)),
                           hintText: 'Discount Code',
-                          border: InputBorder.none),
-                      controller: controller,
-                      textAlignVertical: TextAlignVertical.center,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      applyDiscount();
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFCC434), // Màu nền của container
+                          hintStyle: TextStyle(color: Colors.grey),
+                          border: InputBorder.none,
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 28, vertical: 11),
+                        controller: _controller.textController,
+                        textAlignVertical: TextAlignVertical.center,
+                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => _controller.applyDiscount(setState, context),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                        child: Container(
+                          color: const Color(0xFFFCC434),
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06, vertical: screenHeight * 0.015),
                           child: Text(
                             "Apply",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold), // Màu chữ trắng
+                            style: TextStyle(color: Colors.black, fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     ),
-                  )
-                ]),
+                  ],
+                ),
               ),
-              const SizedBox(
-                height: 25,
-              ),
-              const Divider(
-                color: Color(0xFF2E2E2E),
-                height: 0.2,
-                thickness: 1,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
+              SizedBox(height: screenHeight * 0.03),
+              const Divider(color: Color(0xFF2E2E2E), height: 0.2, thickness: 1),
+              SizedBox(height: screenHeight * 0.03),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Total",
-                    style: TextStyle(fontSize: 18),
-                  ),
+                  Text("Total", style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.white)),
                   Text(
-                      NumberFormat.currency(locale: "vi_VN", symbol: "VND ")
-                          .format(widget.totalPrice - discount),
-                      style: const TextStyle(
-                          color: Color(0xFFFCC434),
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold)),
+                    NumberFormat.currency(locale: "vi_VN", symbol: "VND ").format(widget.totalPrice - _controller.discount),
+                    style: TextStyle(color: const Color(0xFFFCC434), fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              const Text(
-                "Payment Method",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              buildPaymentMethod(
-                  image: "assets/images/Zalopay.png", content: "Zalo Pay"),
-              const SizedBox(
-                height: 8,
-              ),
-              buildPaymentMethod(
-                  image: "assets/images/Momo.png", content: "MoMo"),
-              const SizedBox(
-                height: 8,
-              ),
-              buildPaymentMethod(
-                  image: "assets/images/ShopeePay.png", content: "Shopee Pay"),
-              const SizedBox(
-                height: 8,
-              ),
-              buildPaymentMethod(
-                  image: "assets/images/ATM.png", content: "ATM Card"),
-              const SizedBox(
-                height: 8,
-              ),
-              buildPaymentMethod(
-                  image: "assets/images/ATM.png",
-                  content: "International payments"),
-              const SizedBox(
-                height: 30,
-              ),
-//               ElevatedButton(
-//   onPressed: () async {
-//     await clearSharedPreferences(); // Gọi phương thức để xóa SharedPreferences
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text("Dữ liệu đã được xóa khỏi SharedPreferences"))
-//     );
-//   },
-//   child: Text("Clear SharedPreferences"),
-// ),
-
+              SizedBox(height: screenHeight * 0.02),
+              Text("Payment Method", style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold, color: Colors.white)),
+              SizedBox(height: screenHeight * 0.015),
+              buildPaymentMethod(image: "assets/images/Zalopay.png", content: "Zalo Pay"),
+              SizedBox(height: screenHeight * 0.01),
+              buildPaymentMethod(image: "assets/images/Momo.png", content: "MoMo"),
+              SizedBox(height: screenHeight * 0.01),
+              buildPaymentMethod(image: "assets/images/ShopeePay.png", content: "Shopee Pay"),
+              SizedBox(height: screenHeight * 0.01),
+              buildPaymentMethod(image: "assets/images/ATM.png", content: "ATM Card"),
+              SizedBox(height: screenHeight * 0.01),
+              buildPaymentMethod(image: "assets/images/Visa.png", content: "International payments"),
+              SizedBox(height: screenHeight * 0.03),
               Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFCC434),
-                  borderRadius: BorderRadius.circular(13),
-                ),
+                decoration: BoxDecoration(color: const Color(0xFFFCC434), borderRadius: BorderRadius.circular(screenWidth * 0.03)),
                 child: TextButton(
-                    onPressed: () {
-                      if (selectedPaymentMethod.isEmpty) {
-                        DialogHelper.showCustomDialog(context, "Thông báo",
-                            "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
-                      } else {
-                        print(orderID);
-                        savePaymentInfo(
-                          movieTitle: widget.movieTitle,
-                          cinemaName: widget.cinemaName,
-                          totalPrice: widget.totalPrice - discount,
-                          selectedSeats: widget.selectedSeats,
-                          showTime: widget.showTime,
-                          showDate: widget.showDate,
-                          moviePoster: widget.moviePoster,
-                          genres: widget.genres,
-                          orderID: orderID, cinemaAddress: widget.cinemaAddress,
-                          cinemaImage: widget.cinemaImage,
-                          movieRuntime: widget.movieRuntime
-                        );
-
+                  onPressed: () async {
+                    if (_controller.selectedPaymentMethod.isEmpty) {
+                      DialogHelper.showCustomDialog(context, "Thông báo", "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
+                    } else {
+                      try {
+                        await _controller.savePaymentInfoToFirebase(context);
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    const MainScreen(initialIndex: 1,),
+                            pageBuilder: (context, animation, secondaryAnimation) => const MainScreen(initialIndex: 1),
                             transitionDuration: Duration.zero,
                             reverseTransitionDuration: Duration.zero,
                           ),
                         );
+                      } catch (e) {
+                        DialogHelper.showCustomDialog(context, "Lỗi", "Không thể lưu vé, vui lòng thử lại!");
                       }
-                    },
-                    child: const Text(
-                      "Continue",
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    )),
-              )
+                    }
+                  },
+                  child: Text(
+                    "Continue",
+                    style: TextStyle(fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -418,19 +222,16 @@ Future<void> savePaymentInfo({
     );
   }
 
-  Container buildInforMovie() {
+  Widget buildInforMovie() {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1C),
-          borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: const Color(0xFF1C1C1C), borderRadius: BorderRadius.circular(screenWidth * 0.03)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8.0),
-                bottomLeft: Radius.circular(8.0)),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(8.0), bottomLeft: Radius.circular(8.0)),
             child: Image.network(
               "https://image.tmdb.org/t/p/original${widget.moviePoster}",
               height: 150,
@@ -438,86 +239,59 @@ Future<void> savePaymentInfo({
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 15),
+          SizedBox(width: screenWidth * 0.04),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: screenWidth * 0.04),
                 Text(
                   widget.movieTitle,
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFFCC434)),
+                  style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w700, color: const Color(0xFFFCC434)),
                   overflow: TextOverflow.fade,
                   softWrap: true,
                 ),
-                const SizedBox(
-                  height: 5,
-                ),
+                SizedBox(height: screenWidth * 0.015),
                 Row(
                   children: [
                     const Text("🎬", style: TextStyle(fontSize: 14)),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    SizedBox(width: screenWidth * 0.015),
                     Expanded(
-                      child: Text(widget.genres.join(', '),
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFFE6E6E6),
-                              overflow: TextOverflow.ellipsis),
-                          maxLines: 1),
+                      child: Text(
+                        widget.genres.join(', '),
+                        style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6), overflow: TextOverflow.ellipsis),
+                        maxLines: 1,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 3,
-                ),
+                SizedBox(height: screenWidth * 0.01),
                 Row(
                   children: [
                     const Text("🍿", style: TextStyle(fontSize: 14)),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(widget.cinemaName,
-                        style: const TextStyle(
-                            fontSize: 14, color: Color(0xFFE6E6E6))),
+                    SizedBox(width: screenWidth * 0.015),
+                    Text(widget.cinemaName, style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6))),
                   ],
                 ),
-                const SizedBox(
-                  height: 3,
-                ),
+                SizedBox(height: screenWidth * 0.01),
                 Row(
                   children: [
                     const Text("🕒", style: TextStyle(fontSize: 14)),
-                    const SizedBox(
-                      width: 5,
+                    SizedBox(width: screenWidth * 0.015),
+                    Text(
+                      DateFormat("dd.MM.yyyy").format(widget.showDate),
+                      style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6)),
                     ),
-                    Text(DateFormat("dd.MM.yyyy").format(widget.showDate),
-                        style: const TextStyle(
-                            fontSize: 14, color: Color(0xFFE6E6E6))),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text("•",
-                        style:
-                            TextStyle(fontSize: 14, color: Color(0xFFE6E6E6))),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(widget.showTime,
-                        style: const TextStyle(
-                            fontSize: 14, color: Color(0xFFE6E6E6))),
+                    SizedBox(width: screenWidth * 0.015),
+                    const Text("•", style: TextStyle(fontSize: 14, color: Color(0xFFE6E6E6))),
+                    SizedBox(width: screenWidth * 0.015),
+                    Text(widget.showTime, style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6))),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
