@@ -37,9 +37,13 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.white)));
+            return Center(
+                child: Text("Error: ${snapshot.error}",
+                    style: const TextStyle(color: Colors.white)));
           } else if (!snapshot.hasData) {
-            return const Center(child: Text("No details available", style: TextStyle(color: Colors.white)));
+            return const Center(
+                child: Text("No details available",
+                    style: TextStyle(color: Colors.white)));
           }
 
           final movieDetail = snapshot.data!;
@@ -57,12 +61,17 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                   height: screenHeight * 0.35,
                   width: double.infinity,
                   color: Colors.grey,
-                  child: const Center(child: Text("No Image Available", style: TextStyle(color: Colors.amber, fontSize: 18))),
+                  child: const Center(
+                      child: Text("No Image Available",
+                          style: TextStyle(color: Colors.amber, fontSize: 18))),
                 ),
               ),
               SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.only(top: screenHeight * 0.25, left: screenWidth * 0.04, right: screenWidth * 0.04),
+                  padding: EdgeInsets.only(
+                      top: screenHeight * 0.25,
+                      left: screenWidth * 0.04,
+                      right: screenWidth * 0.04),
                   child: Column(
                     children: [
                       buildInfor1(movieDetail),
@@ -76,11 +85,17 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                           SizedBox(height: screenHeight * 0.01),
                           Language(movieDetail: movieDetail),
                           SizedBox(height: screenHeight * 0.02),
-                          const Text("Storyline", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                          const Text("Storyline",
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
                           SizedBox(height: screenHeight * 0.015),
                           ReadMoreText(
                             movieDetail.overview,
-                            style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.white),
+                            style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                                color: Colors.white),
                             trimLines: 4,
                             trimLength: 150,
                             colorClickableText: Colors.yellow,
@@ -91,7 +106,11 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                           SizedBox(height: screenHeight * 0.015),
                           Credits(movieDetail: movieDetail),
                           SizedBox(height: screenHeight * 0.02),
-                          const Text("Cinema", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                          const Text("Cinema",
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
                           SizedBox(height: screenHeight * 0.015),
                           buildCinema(),
                           SizedBox(height: screenHeight * 0.02),
@@ -99,22 +118,33 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: const Color(0xFFFCC434),
-                              borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                              borderRadius:
+                                  BorderRadius.circular(screenWidth * 0.03),
                             ),
                             child: TextButton(
                               onPressed: () {
                                 if (_controller.selectedIndex == -1) {
-                                  DialogHelper.showCustomDialog(context, "Thông báo", "Vui lòng chọn rạp chiếu phim trước khi tiếp tục!");
+                                  DialogHelper.showCustomDialog(
+                                      context,
+                                      "Thông báo",
+                                      "Vui lòng chọn rạp chiếu phim trước khi tiếp tục!");
                                 } else {
                                   Navigator.push(
                                     context,
                                     PageRouteBuilder(
-                                      pageBuilder: (context, animation, secondaryAnimation) => SelectSeat(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          SelectSeat(
                                         movieTitle: movieDetail.title,
                                         movieRuntime: movieDetail.runtime,
-                                        cinemaName: _controller.cinemaList[_controller.selectedIndex]["name"]!,
-                                        cinemaAddress: _controller.cinemaList[_controller.selectedIndex]["address"]!,
-                                        cinemaImage: _controller.cinemaList[_controller.selectedIndex]["image"]!,
+                                        cinemaName: _controller.cinemaList[
+                                            _controller.selectedIndex]["name"]!,
+                                        cinemaAddress: _controller.cinemaList[
+                                                _controller.selectedIndex]
+                                            ["address"]!,
+                                        cinemaImage: _controller.cinemaList[
+                                                _controller.selectedIndex]
+                                            ["image"]!,
                                         moviePoster: movieDetail.posterPath,
                                         genres: movieDetail.genres,
                                       ),
@@ -126,7 +156,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                               },
                               child: Text(
                                 "Continue",
-                                style: TextStyle(fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold, color: Colors.black),
+                                style: TextStyle(
+                                    fontSize: screenWidth * 0.06,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
                               ),
                             ),
                           ),
@@ -161,10 +194,14 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
               padding: EdgeInsets.all(screenWidth * 0.03),
               margin: EdgeInsets.only(top: screenWidth * 0.02),
               decoration: BoxDecoration(
-                color: _controller.selectedIndex == index ? const Color(0xFF261D08) : const Color(0xFF1C1C1C),
+                color: _controller.selectedIndex == index
+                    ? const Color(0xFF261D08)
+                    : const Color(0xFF1C1C1C),
                 borderRadius: BorderRadius.circular(screenWidth * 0.03),
                 border: Border.all(
-                  color: _controller.selectedIndex == index ? const Color(0xFFFCC434) : Colors.transparent,
+                  color: _controller.selectedIndex == index
+                      ? const Color(0xFFFCC434)
+                      : Colors.transparent,
                   width: 2,
                 ),
               ),
@@ -178,12 +215,17 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       children: [
                         Text(
                           _controller.cinemaList[index]["name"]!,
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: screenWidth * 0.045),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: screenWidth * 0.045),
                         ),
                         SizedBox(height: screenWidth * 0.015),
                         Text(
                           _controller.cinemaList[index]["address"]!,
-                          style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.035),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: screenWidth * 0.035),
                         ),
                       ],
                     ),
@@ -217,7 +259,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         children: [
           Text(
             movieDetail.title,
-            style: TextStyle(fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+                fontSize: screenWidth * 0.06,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           ),
           SizedBox(height: screenWidth * 0.02),
           Row(
@@ -226,14 +271,16 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
               SizedBox(width: screenWidth * 0.01),
               Text(
                 _controller.formatRuntime(movieDetail.runtime),
-                style: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: screenWidth * 0.035, color: Colors.grey),
               ),
               SizedBox(width: screenWidth * 0.03),
               const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
               SizedBox(width: screenWidth * 0.01),
               Text(
                 _controller.formatDate(movieDetail.releaseDate),
-                style: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: screenWidth * 0.035, color: Colors.grey),
               ),
             ],
           ),
@@ -243,18 +290,24 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
             children: [
               Row(
                 children: [
-                  const Text("Review", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Text("Review",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   SizedBox(width: screenWidth * 0.02),
                   const Icon(Icons.star, color: Colors.yellow, size: 18),
                   SizedBox(width: screenWidth * 0.01),
                   Text(
                     movieDetail.voteAverage.toStringAsFixed(1),
-                    style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.04, color: Colors.white),
                   ),
                   SizedBox(width: screenWidth * 0.01),
                   Text(
                     '(${movieDetail.voteCount})',
-                    style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey),
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.03, color: Colors.grey),
                   ),
                 ],
               ),
@@ -272,12 +325,15 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: List.generate(5, (index) {
                         return GestureDetector(
-                          onTap: () => _controller.saveSelectedStars(index + 1, setStarState),
+                          onTap: () => _controller.saveSelectedStars(
+                              index + 1, setStarState),
                           child: Padding(
                             padding: EdgeInsets.only(right: screenWidth * 0.01),
                             child: Icon(
                               Icons.star,
-                              color: index < _controller.selectedStars ? const Color(0xFFFCC434) : const Color(0xFF575757),
+                              color: index < _controller.selectedStars
+                                  ? const Color(0xFFFCC434)
+                                  : const Color(0xFF575757),
                               size: screenWidth * 0.07,
                             ),
                           ),
@@ -322,12 +378,20 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     );
                   }
                 },
-                icon: const Icon(Icons.play_circle_filled, color: Colors.white, size: 20),
-                label: const Text("Trailer", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.play_circle_filled,
+                    color: Colors.white, size: 20),
+                label: const Text("Trailer",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFCC434),
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.02),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(screenWidth * 0.02)),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.04,
+                      vertical: screenWidth * 0.02),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(screenWidth * 0.02)),
                   elevation: 2,
                 ),
               ),

@@ -6,7 +6,8 @@ import 'package:moviego/screens/homepage.dart';
 import 'package:moviego/screens/ticket_detail.dart';
 
 class TicketPage extends StatelessWidget {
-  final TicketController _controller = TicketController(); // Khởi tạo Controller
+  final TicketController _controller =
+      TicketController(); // Khởi tạo Controller
 
   TicketPage({super.key});
 
@@ -50,12 +51,16 @@ class TicketPage extends StatelessWidget {
 
                 final movieTitle = ticket['movieTitle'] ?? 'Không có tiêu đề';
                 final cinemaName = ticket['cinemaName'] ?? 'Không có tên rạp';
-                final selectedSeats = (ticket['selectedSeats'] as List<dynamic>?)?.join(', ') ?? 'Không có ghế';
-                final showTime = ticket['showTime'] ?? 'Không có thời gian chiếu';
+                final selectedSeats =
+                    (ticket['selectedSeats'] as List<dynamic>?)?.join(', ') ??
+                        'Không có ghế';
+                final showTime =
+                    ticket['showTime'] ?? 'Không có thời gian chiếu';
                 final showDate = ticket['showDate'] ?? 'Không có ngày chiếu';
                 final totalPrice = ticket['totalPrice']?.toString() ?? '0';
                 final moviePoster = ticket['moviePoster'] ?? '';
-                final genres = (ticket['genres'] as List<dynamic>?)?.cast<String>() ?? [];
+                final genres =
+                    (ticket['genres'] as List<dynamic>?)?.cast<String>() ?? [];
 
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -64,7 +69,8 @@ class TicketPage extends StatelessWidget {
                       padding: const EdgeInsets.all(0),
                       child: GestureDetector(
                         onTap: () {
-                          Map<String, String> ticketDetails = ticket.map((key, value) {
+                          Map<String, String> ticketDetails =
+                              ticket.map((key, value) {
                             if (value is List) {
                               return MapEntry(key, value.join(', '));
                             } else {
@@ -75,7 +81,9 @@ class TicketPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) => TicketDetail(ticketDetails: ticketDetails),
+                              pageBuilder: (context, animation,
+                                      secondaryAnimation) =>
+                                  TicketDetail(ticketDetails: ticketDetails),
                               transitionDuration: Duration.zero,
                               reverseTransitionDuration: Duration.zero,
                             ),
@@ -122,12 +130,16 @@ class TicketPage extends StatelessWidget {
                                   const SizedBox(height: 18),
                                   Row(
                                     children: [
-                                      const Text("🎬", style: TextStyle(fontSize: 10)),
+                                      const Text("🎬",
+                                          style: TextStyle(fontSize: 10)),
                                       const SizedBox(width: 5),
                                       Expanded(
                                         child: Text(
                                           genres.join(', '),
-                                          style: const TextStyle(fontSize: 12, color: Color(0xFFE6E6E6), overflow: TextOverflow.ellipsis),
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFFE6E6E6),
+                                              overflow: TextOverflow.ellipsis),
                                           maxLines: 1,
                                         ),
                                       ),
@@ -136,22 +148,28 @@ class TicketPage extends StatelessWidget {
                                   const SizedBox(height: 3),
                                   Row(
                                     children: [
-                                      const Text("🍿", style: TextStyle(fontSize: 10)),
+                                      const Text("🍿",
+                                          style: TextStyle(fontSize: 10)),
                                       const SizedBox(width: 5),
                                       Text(
                                         cinemaName,
-                                        style: const TextStyle(fontSize: 12, color: Color(0xFFE6E6E6)),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFFE6E6E6)),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 3),
                                   Row(
                                     children: [
-                                      const Text("💸", style: TextStyle(fontSize: 10)),
+                                      const Text("💸",
+                                          style: TextStyle(fontSize: 10)),
                                       const SizedBox(width: 5),
                                       Text(
                                         "${NumberFormat('#,###', 'vi_VN').format(int.parse(totalPrice))} VND",
-                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ],
                                   ),

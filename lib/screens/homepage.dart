@@ -1,33 +1,23 @@
 import 'dart:core';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-
 import 'package:carousel_slider/carousel_slider.dart';
-
 import 'package:moviego/Model/movie.dart';
 import 'package:moviego/Services/services.dart';
 import 'package:moviego/screens/moviedetails.dart';
 import 'package:moviego/widgets/bottom_app_bar.dart';
-import 'package:moviego/widgets/coming_soon_header.dart';
-import 'package:moviego/widgets/coming_soon_movies.dart';
-import 'package:moviego/widgets/movie_news_header.dart';
-import 'package:moviego/widgets/movie_news_widget.dart';
-import 'package:moviego/widgets/now_showing_header.dart';
-import 'package:moviego/widgets/now_showing_movies.dart';
-import 'package:moviego/widgets/promo_discount.dart';
-import 'package:moviego/widgets/promo_discount_header.dart';
-import 'package:moviego/widgets/service_header.dart';
-import 'package:moviego/widgets/service_widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required void Function(int index) onTabChange});
+  const HomePage({super.key, required this.onTabChange});
+
+  final void Function(int index) onTabChange;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
 String formatDate(String date) {
@@ -45,16 +35,59 @@ String formatRuntime(int runtime) {
   return "${hours}h${minutes}m";
 }
 
-class _HomePageState extends State<HomePage> {
-  final String userName = "Son Tung MTP";
+class HomePageState extends State<HomePage> {
+  String userName = "Guest";
   late Future<List<Movie>> nowShowing = APIserver().getNowShowing();
   late Future<List<Movie>> comingSoon = APIserver().getComingSoon();
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserName();
+  }
+
+  void loadUserName() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (userDoc.exists && userDoc.data() != null) {
+          String fetchedName =
+              (userDoc.data() as Map<String, dynamic>)['name'] ?? 'Guest';
+          setState(() {
+            userName = fetchedName;
+          });
+        } else {
+          setState(() {
+            userName = "Guest"; // Nếu không có tài liệu, dùng "Guest"
+          });
+        }
+      } catch (e) {
+        print('Error fetching user name from Firestore: $e');
+        setState(() {
+          userName = "Guest";
+        });
+      }
+    } else {
+      setState(() {
+        userName = "Guest";
+      });
+    }
+  }
+
+  void navigateToProfile() {
+    widget.onTabChange(3);
+    loadUserName();
+  }
 
   final List<Map<String, String>> movieNews = [
     {
       "image": "assets/images/Mufasa.png",
       "title":
-          "Box Office: ‘Mufasa’ Wins With ${23.8}M, ‘Sonic 3’ Sits at No. 2 as Franchise Crosses ${1}B Globally"
+          "Box Office: ‘Mufasa’ Wins With \${23.8}M, ‘Sonic 3’ Sits at No. 2 as Franchise Crosses \${1}B Globally"
     },
     {
       "image": "assets/images/toy_story_4_-publicity_still_13-h_2019.png",
@@ -78,90 +111,63 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData(); // Khởi tạo dữ liệu ban đầu
-  }
-
-  // Hàm tải dữ liệu từ API
-  void _loadData() {
-    setState(() {
-      nowShowing = APIserver().getNowShowing();
-      comingSoon = APIserver().getComingSoon();
-    });
-  }
-
-  Future<void> _onRefresh() async {
-  try {
-    _loadData();
-    await Future.wait([nowShowing, comingSoon]);
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Failed to refresh data: $e")),
-    );
-  }
-}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(userName),
-      body: Container(
-        color: Colors.black,
-        child: RefreshIndicator(
-          onRefresh: _onRefresh,
-          color: Colors.yellow,
-          child: SingleChildScrollView(
-            
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: <Widget>[
-                const SearchBar(),
-                const SizedBox(height: 20),
-                const NowShowingHeader(),
-                const SizedBox(
-                  height: 15,
-                ),
-                NowShowingMovies(nowShowing: nowShowing),
-                const ComingSoonHeader(),
-                const SizedBox(height: 15),
-                ComingSoonMovies(comingSoon: comingSoon),
-                const SizedBox(height: 15),
-                const PromoDiscountHeader(),
-                const SizedBox(height: 5),
-                const PromoDiscount(),
-                const ServiceHeader(),
-                const SizedBox(height: 5),
-                const ServiceWidget(),
-                const SizedBox(height: 10),
-                const MovieNewsHeader(),
-                const SizedBox(height: 5),
-                MovieNewsWidget(movieNews: movieNews)
-              ],
-            ),
-          ),
+      appBar: buildAppBar(userName, context),
+      backgroundColor: const Color.fromARGB(184, 0, 0, 0),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: <Widget>[
+            const SearchBar(),
+            const SizedBox(height: 20),
+            const NowShowingHeader(),
+            const SizedBox(height: 15),
+            NowShowingMovies(nowShowing: nowShowing),
+            const ComingSoonHeader(),
+            const SizedBox(height: 15),
+            ComingSoonMovies(comingSoon: comingSoon),
+            const SizedBox(height: 15),
+            const PromoDiscountHeader(),
+            const SizedBox(height: 5),
+            const PromoDiscount(),
+            const ServiceHeader(),
+            const SizedBox(height: 5),
+            const ServiceWidget(),
+            const SizedBox(height: 10),
+            const MovieNewsHeader(),
+            const SizedBox(height: 5),
+            MovieNewsWidget(movieNews: movieNews),
+          ],
         ),
       ),
     );
   }
 
-  AppBar buildAppBar(String userName) {
+  AppBar buildAppBar(String userName, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return AppBar(
       title: Container(
-        margin: const EdgeInsets.all(10),
+        margin: EdgeInsets.all(screenWidth * 0.01),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Hi, $userName',
-              style: const TextStyle(fontSize: 14, color: Colors.white),
-            ),
-            const Text(
-              'MovieGo',
               style: TextStyle(
-                  fontSize: 26, color: Colors.yellow, fontFamily: "Ultra"),
+                fontSize: screenWidth * 0.04,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'MOVIEGO',
+              style: TextStyle(
+                fontSize: screenWidth * 0.065,
+                color: Colors.yellow,
+                fontFamily: "Ultra",
+              ),
             ),
           ],
         ),
@@ -171,28 +177,658 @@ class _HomePageState extends State<HomePage> {
           Icons.notifications_rounded,
           color: Colors.white,
         ),
-        const SizedBox(width: 20),
         Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/images/mtp.jpg',
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
+          padding: const EdgeInsets.only(left: 10),
+          child: GestureDetector(
+            onTap: navigateToProfile,
+            child: ClipOval(
+              child: Image.network(
+                FirebaseAuth.instance.currentUser?.photoURL ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/avatar.png',
+                    fit: BoxFit.cover,
+                    width: screenWidth * 0.11,
+                    height: screenWidth * 0.11,
+                  );
+                },
+                width: screenWidth * 0.11,
+                height: screenWidth * 0.11,
+              ),
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: screenWidth * 0.025),
       ],
       elevation: 0,
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(184, 0, 0, 0),
       automaticallyImplyLeading: false,
       surfaceTintColor: Colors.black,
     );
   }
 }
 
+class MovieNewsWidget extends StatelessWidget {
+  const MovieNewsWidget({super.key, required this.movieNews});
+
+  final List<Map<String, String>> movieNews;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(movieNews.length, (index) {
+            final movie = movieNews[index];
+            return GestureDetector(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("${movie['title']} tapped!")),
+                );
+              },
+              child: Container(
+                width: 200,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        movie['image']!,
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      movie['title']!,
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+            );
+          })),
+    );
+  }
+}
+
+class MovieNewsHeader extends StatelessWidget {
+  const MovieNewsHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 10, right: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Movie news",
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () {},
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "See all",
+                  style: TextStyle(fontSize: 14, color: Colors.yellow),
+                ),
+                SizedBox(width: 5),
+                Icon(Icons.arrow_forward_ios, color: Colors.yellow, size: 14)
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ServiceWidget extends StatelessWidget {
+  const ServiceWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        GestureDetector(
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Retal tapped!")),
+            );
+          },
+          child: Column(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  "assets/images/Retal.png",
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "Retal",
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("IMAX tapped!")),
+            );
+          },
+          child: Column(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  "assets/images/Imax.png",
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "Imax",
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("4DX tapped!")),
+            );
+          },
+          child: Column(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  "assets/images/4Dx.png",
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "4DX",
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("SweetBox tapped!")),
+            );
+          },
+          child: Column(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  "assets/images/Sweetbox.png",
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "SweetBox",
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ServiceHeader extends StatelessWidget {
+  const ServiceHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 10, right: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Service",
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () {},
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "See all",
+                  style: TextStyle(fontSize: 14, color: Colors.yellow),
+                ),
+                SizedBox(width: 5),
+                Icon(Icons.arrow_forward_ios, color: Colors.yellow, size: 14)
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PromoDiscount extends StatelessWidget {
+  const PromoDiscount({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      child: Image.asset('assets/images/Discount.png'),
+    );
+  }
+}
+
+class PromoDiscountHeader extends StatelessWidget {
+  const PromoDiscountHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 0, right: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Promo & Discount",
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () {},
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "See all",
+                  style: TextStyle(fontSize: 14, color: Colors.yellow),
+                ),
+                SizedBox(width: 5),
+                Icon(Icons.arrow_forward_ios, color: Colors.yellow, size: 14)
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ComingSoonMovies extends StatelessWidget {
+  const ComingSoonMovies({super.key, required this.comingSoon});
+
+  final Future<List<Movie>> comingSoon;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: comingSoon,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text("No movies available"));
+        }
+
+        final movies = snapshot.data!;
+
+        return SizedBox(
+          height: 300,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(left: 8),
+            itemCount: movies.length,
+            itemBuilder: (context, index) {
+              final movie = movies[index];
+              return FutureBuilder<Movie>(
+                future: APIserver().getMovieDetail(movie.id),
+                builder: (context, movieDetailSnapshot) {
+                  if (movieDetailSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (movieDetailSnapshot.hasError) {
+                    return Center(
+                        child: Text("Error: ${movieDetailSnapshot.error}"));
+                  } else if (!movieDetailSnapshot.hasData) {
+                    return const Center(
+                        child: Text("No movie details available"));
+                  }
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MovieDetailPage(movie: movie),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 165,
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 230,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  "https://image.tmdb.org/t/p/original${movie.posterPath}",
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            movie.title,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Row(
+                            children: [
+                              const FaIcon(FontAwesomeIcons.video, size: 12),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  movie.genres.join(", "),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_month_outlined,
+                                  size: 14),
+                              const SizedBox(width: 3),
+                              Text(
+                                formatDate(movie.releaseDate),
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ComingSoonHeader extends StatelessWidget {
+  const ComingSoonHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 20, right: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Coming soon",
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const MainScreen(initialIndex: 2),
+                ),
+              );
+            },
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "See all",
+                  style: TextStyle(fontSize: 14, color: Colors.yellow),
+                ),
+                SizedBox(width: 5),
+                Icon(Icons.arrow_forward_ios, color: Colors.yellow, size: 14)
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NowShowingMovies extends StatelessWidget {
+  const NowShowingMovies({super.key, required this.nowShowing});
+
+  final Future<List<Movie>> nowShowing;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: nowShowing,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text("No movies available"));
+        }
+        final movies = snapshot.data!;
+
+        return CarouselSlider.builder(
+          itemCount: movies.length,
+          itemBuilder: (context, index, movieIndex) {
+            final movie = movies[index];
+            return FutureBuilder<Movie>(
+              future: APIserver().getMovieDetail(movie.id),
+              builder: (context, movieDetailSnapshot) {
+                if (movieDetailSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (movieDetailSnapshot.hasError) {
+                  return Center(
+                      child: Text("Error: ${movieDetailSnapshot.error}"));
+                } else if (!movieDetailSnapshot.hasData) {
+                  return const Center(
+                      child: Text("No movie details available"));
+                }
+
+                final movieDetail = movieDetailSnapshot.data!;
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailPage(movie: movie),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                "https://image.tmdb.org/t/p/original${movie.posterPath}",
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 5),
+                        child: Center(
+                          child: Text(
+                            movie.title,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.access_time,
+                                color: Colors.white, size: 12),
+                            const SizedBox(width: 1),
+                            Text(
+                              formatRuntime(movieDetail.runtime),
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.white),
+                            ),
+                            const SizedBox(width: 3),
+                            const Text("•",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white)),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                movie.genres.join(', '),
+                                style: const TextStyle(fontSize: 12),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.star,
+                                color: Colors.yellow, size: 17),
+                            Text(
+                              movie.voteAverage.toStringAsFixed(1),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(width: 2),
+                            Text('(${movie.voteCount})',
+                                style: const TextStyle(fontSize: 10)),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+          options: CarouselOptions(
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 3),
+            enlargeCenterPage: true,
+            aspectRatio: 0.66,
+            scrollPhysics: const BouncingScrollPhysics(),
+            enableInfiniteScroll: true,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class NowShowingHeader extends StatelessWidget {
+  const NowShowingHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 20, right: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Now playing",
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const MainScreen(initialIndex: 2),
+                ),
+              );
+            },
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "See all",
+                  style: TextStyle(fontSize: 14, color: Colors.yellow),
+                ),
+                SizedBox(width: 5),
+                Icon(Icons.arrow_forward_ios, color: Colors.yellow, size: 14)
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class SearchBar extends StatefulWidget {
   const SearchBar({super.key});
@@ -212,7 +848,7 @@ class _SearchBarState extends State<SearchBar> {
   void initState() {
     super.initState();
     _focusNode.addListener(() {
-      setState(() {}); // Cập nhật trạng thái khi focus thay đổi
+      setState(() {});
     });
   }
 
@@ -263,15 +899,15 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque, // Nhận tất cả các sự kiện chạm
+      behavior: HitTestBehavior.opaque,
       onTap: () {
-        FocusScope.of(context).unfocus(); // Đóng bàn phím
-        _hideSearchResults(); // Ẩn kết quả tìm kiếm
+        FocusScope.of(context).unfocus();
+        _hideSearchResults();
       },
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: TextField(
               controller: _controller,
               focusNode: _focusNode,
@@ -280,7 +916,8 @@ class _SearchBarState extends State<SearchBar> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 ),
-                prefixIcon: const Icon(FeatherIcons.search, color: Colors.white),
+                prefixIcon:
+                    const Icon(FeatherIcons.search, color: Colors.white),
                 suffixIcon: _controller.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear, color: Colors.white),
@@ -293,30 +930,22 @@ class _SearchBarState extends State<SearchBar> {
                 fillColor: Colors.grey[900],
               ),
               onChanged: _onSearchChanged,
-              onTap: () {
-                // Không làm gì khi nhấn vào TextField
-              },
+              onTap: () {},
             ),
           ),
           if (_searchResults.isNotEmpty)
             GestureDetector(
-              onTap: () {
-                // Ngăn chặn đóng danh sách khi nhấn vào trong danh sách
-              },
+              onTap: () {},
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 14),
-                constraints: const BoxConstraints(
-                  maxHeight: 300, // Giới hạn chiều cao danh sách kết quả
-                ),
+                constraints: const BoxConstraints(maxHeight: 300),
                 decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(8)
-                ),
+                    color: Colors.grey[900],
+                    borderRadius: BorderRadius.circular(8)),
                 child: SingleChildScrollView(
                   child: Column(
                     children: _searchResults.map((movie) {
                       return ListTile(
-                        
                         leading: Image.network(
                           "https://image.tmdb.org/t/p/w200${movie.posterPath}",
                           fit: BoxFit.cover,
@@ -331,7 +960,8 @@ class _SearchBarState extends State<SearchBar> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MovieDetailPage(movie: movie),
+                              builder: (context) =>
+                                  MovieDetailPage(movie: movie),
                             ),
                           );
                         },
@@ -341,16 +971,9 @@ class _SearchBarState extends State<SearchBar> {
                 ),
               ),
             ),
-          if (_isSearching)
-            const Center(child: CircularProgressIndicator()),
+          if (_isSearching) const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-

@@ -35,7 +35,8 @@ class _SelectSeatState extends State<SelectSeat> {
   @override
   void initState() {
     super.initState();
-    _controller = SeatController(movieTitle: widget.movieTitle, cinemaName: widget.cinemaName);
+    _controller = SeatController(
+        movieTitle: widget.movieTitle, cinemaName: widget.cinemaName);
   }
 
   @override
@@ -57,21 +58,29 @@ class _SelectSeatState extends State<SelectSeat> {
 
           if (snapshot.hasError) {
             print("Stream error: ${snapshot.error}");
-            return const Center(child: Text("Error loading seats", style: TextStyle(color: Colors.white)));
+            return const Center(
+                child: Text("Error loading seats",
+                    style: TextStyle(color: Colors.white)));
           }
 
           if (snapshot.hasData && snapshot.data!.exists) {
-            List<String> bookedSeatsList = List<String>.from(snapshot.data!['bookedSeats'] ?? []);
-            _controller.bookedSeats = List.generate(_controller.rows, (i) => List.filled(_controller.cols, false));
+            List<String> bookedSeatsList =
+                List<String>.from(snapshot.data!['bookedSeats'] ?? []);
+            _controller.bookedSeats = List.generate(
+                _controller.rows, (i) => List.filled(_controller.cols, false));
             for (String seat in bookedSeatsList) {
               int row = seat.codeUnitAt(0) - 65;
               int col = int.parse(seat.substring(1)) - 1;
-              if (row >= 0 && row < _controller.rows && col >= 0 && col < _controller.cols) {
+              if (row >= 0 &&
+                  row < _controller.rows &&
+                  col >= 0 &&
+                  col < _controller.cols) {
                 _controller.bookedSeats[row][col] = true;
               }
             }
           } else {
-            _controller.bookedSeats = List.generate(_controller.rows, (i) => List.filled(_controller.cols, false));
+            _controller.bookedSeats = List.generate(
+                _controller.rows, (i) => List.filled(_controller.cols, false));
           }
 
           return Padding(
@@ -92,9 +101,15 @@ class _SelectSeatState extends State<SelectSeat> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        buildSeatStatusBar(color: const Color(0xFF1C1C1C), content: 'Available'),
-                        buildSeatStatusBar(color: const Color(0xFF261D08), content: 'Reserved'),
-                        buildSeatStatusBar(color: const Color(0xFFFCC434), content: 'Selected'),
+                        buildSeatStatusBar(
+                            color: const Color(0xFF1C1C1C),
+                            content: 'Available'),
+                        buildSeatStatusBar(
+                            color: const Color(0xFF261D08),
+                            content: 'Reserved'),
+                        buildSeatStatusBar(
+                            color: const Color(0xFFFCC434),
+                            content: 'Selected'),
                       ],
                     ),
                   ),
@@ -110,7 +125,8 @@ class _SelectSeatState extends State<SelectSeat> {
                       scrollDirection: Axis.horizontal,
                       itemCount: 30,
                       itemBuilder: (context, index) {
-                        DateTime date = DateTime.now().add(Duration(days: index));
+                        DateTime date =
+                            DateTime.now().add(Duration(days: index));
                         return buildDateWidget(date);
                       },
                     ),
@@ -127,9 +143,12 @@ class _SelectSeatState extends State<SelectSeat> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  const Divider(color: Color(0xFF2E2E2E), height: 0.2, thickness: 1),
+                  const Divider(
+                      color: Color(0xFF2E2E2E), height: 0.2, thickness: 1),
                   Row(
-                    mainAxisAlignment: _controller.calculatePrice() > 0 ? MainAxisAlignment.spaceEvenly : MainAxisAlignment.center,
+                    mainAxisAlignment: _controller.calculatePrice() > 0
+                        ? MainAxisAlignment.spaceEvenly
+                        : MainAxisAlignment.center,
                     children: [
                       if (_controller.calculatePrice() > 0)
                         Column(
@@ -138,8 +157,11 @@ class _SelectSeatState extends State<SelectSeat> {
                           children: [
                             const Text("Total"),
                             Text(
-                              NumberFormat.currency(locale: "vi_VN", symbol: "VND ").format(_controller.calculatePrice()),
-                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                              NumberFormat.currency(
+                                      locale: "vi_VN", symbol: "VND ")
+                                  .format(_controller.calculatePrice()),
+                              style: const TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -153,13 +175,17 @@ class _SelectSeatState extends State<SelectSeat> {
                               if (mounted) {
                                 Navigator.of(context).push(
                                   PageRouteBuilder(
-                                    pageBuilder: (context, animation, secondaryAnimation) => Payment(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        Payment(
                                       movieTitle: widget.movieTitle,
                                       cinemaName: widget.cinemaName,
                                       cinemaAddress: widget.cinemaAddress,
                                       cinemaImage: widget.cinemaImage,
-                                      selectedSeats: _controller.selectedSeatsList,
-                                      showTime: _controller.availableTimes[_controller.selectedTimeIndex],
+                                      selectedSeats:
+                                          _controller.selectedSeatsList,
+                                      showTime: _controller.availableTimes[
+                                          _controller.selectedTimeIndex],
                                       totalPrice: _controller.calculatePrice(),
                                       showDate: _controller.selectedDate,
                                       moviePoster: widget.moviePoster,
@@ -168,22 +194,30 @@ class _SelectSeatState extends State<SelectSeat> {
                                     ),
                                     transitionDuration: Duration.zero,
                                     reverseTransitionDuration: Duration.zero,
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
                                       return child;
                                     },
                                   ),
                                 );
                               }
                             } else {
-                              DialogHelper.showCustomDialog(context, "Thông báo", "Vui lòng chọn ghế trước khi tiếp tục!");
+                              DialogHelper.showCustomDialog(
+                                  context,
+                                  "Thông báo",
+                                  "Vui lòng chọn ghế trước khi tiếp tục!");
                             }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFCC434),
-                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 28),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24)),
                           ),
-                          child: const Text('Buy Ticket', style: TextStyle(fontSize: 18, color: Colors.black)),
+                          child: const Text('Buy Ticket',
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.black)),
                         ),
                       ),
                     ],
@@ -218,7 +252,11 @@ class _SelectSeatState extends State<SelectSeat> {
           onTap: () => _controller.toggleSeat(row, col, setState),
           child: Container(
             decoration: BoxDecoration(
-              color: isBooked ? const Color(0xFF261D08) : isSelected ? const Color(0xFFFCC434) : const Color(0xFF1C1C1C),
+              color: isBooked
+                  ? const Color(0xFF261D08)
+                  : isSelected
+                      ? const Color(0xFFFCC434)
+                      : const Color(0xFF1C1C1C),
               borderRadius: BorderRadius.circular(4.0),
             ),
             child: Center(
@@ -226,7 +264,11 @@ class _SelectSeatState extends State<SelectSeat> {
                 _controller.getSeatLabel(row, col),
                 style: TextStyle(
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                  color: isBooked ? const Color(0xFFFCC434) : isSelected ? Colors.black : Colors.white,
+                  color: isBooked
+                      ? const Color(0xFFFCC434)
+                      : isSelected
+                          ? Colors.black
+                          : Colors.white,
                   fontSize: 12,
                 ),
               ),
@@ -244,7 +286,9 @@ class _SelectSeatState extends State<SelectSeat> {
         padding: const EdgeInsets.all(7),
         margin: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
-          color: _controller.isSameDay(_controller.selectedDate, date) ? const Color(0xFFFCC434) : const Color(0xFF1C1C1C),
+          color: _controller.isSameDay(_controller.selectedDate, date)
+              ? const Color(0xFFFCC434)
+              : const Color(0xFF1C1C1C),
           borderRadius: BorderRadius.circular(26),
         ),
         child: Column(
@@ -255,7 +299,9 @@ class _SelectSeatState extends State<SelectSeat> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: _controller.isSameDay(date, _controller.selectedDate) ? const Color(0xFF1C1C1C) : const Color(0xFFF2F2F2),
+                color: _controller.isSameDay(date, _controller.selectedDate)
+                    ? const Color(0xFF1C1C1C)
+                    : const Color(0xFFF2F2F2),
               ),
             ),
             const SizedBox(height: 17),
@@ -263,7 +309,9 @@ class _SelectSeatState extends State<SelectSeat> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: _controller.isSameDay(date, _controller.selectedDate) ? const Color(0xFF1C1C1C) : Colors.grey[600],
+                color: _controller.isSameDay(date, _controller.selectedDate)
+                    ? const Color(0xFF1C1C1C)
+                    : Colors.grey[600],
                 borderRadius: BorderRadius.circular(17.5),
               ),
               child: Center(
@@ -286,16 +334,22 @@ class _SelectSeatState extends State<SelectSeat> {
         padding: const EdgeInsets.only(right: 26, left: 26),
         margin: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
-          color: _controller.selectedTimeIndex == index ? const Color(0xFF261D08) : const Color(0xFF1C1C1C),
+          color: _controller.selectedTimeIndex == index
+              ? const Color(0xFF261D08)
+              : const Color(0xFF1C1C1C),
           borderRadius: BorderRadius.circular(20),
-          border: _controller.selectedTimeIndex == index ? Border.all(color: const Color(0xFFFCC434)) : null,
+          border: _controller.selectedTimeIndex == index
+              ? Border.all(color: const Color(0xFFFCC434))
+              : null,
         ),
         child: Center(
           child: Text(
             _controller.availableTimes[index],
             style: TextStyle(
               fontSize: 15,
-              fontWeight: _controller.selectedTimeIndex == index ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: _controller.selectedTimeIndex == index
+                  ? FontWeight.w600
+                  : FontWeight.normal,
             ),
           ),
         ),
@@ -309,7 +363,8 @@ class _SelectSeatState extends State<SelectSeat> {
         Container(
           height: 20,
           width: 20,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(
+              color: color, borderRadius: BorderRadius.circular(4)),
         ),
         const SizedBox(width: 8),
         Text(content, style: const TextStyle(fontSize: 14)),

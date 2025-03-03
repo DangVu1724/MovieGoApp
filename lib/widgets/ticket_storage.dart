@@ -44,10 +44,8 @@ class TicketStorage {
   }
 
   static Future<void> clearSharedPreferences() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-  print("Đã xóa toàn bộ dữ liệu trong SharedPreferences");
-}
-
-
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    print("Đã xóa toàn bộ dữ liệu trong SharedPreferences");
+  }
 }

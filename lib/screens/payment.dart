@@ -68,25 +68,38 @@ class _PaymentState extends State<Payment> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    GestureDetector buildPaymentMethod({required String image, required String content}) {
+    GestureDetector buildPaymentMethod(
+        {required String image, required String content}) {
       return GestureDetector(
         onTap: () => _controller.selectPaymentMethod(content, setState),
         child: Container(
           padding: EdgeInsets.all(screenWidth * 0.04),
           decoration: BoxDecoration(
-            color: _controller.selectedPaymentMethod == content ? const Color(0xFF261D08) : const Color(0xFF1C1C1C),
+            color: _controller.selectedPaymentMethod == content
+                ? const Color(0xFF261D08)
+                : const Color(0xFF1C1C1C),
             borderRadius: BorderRadius.circular(screenWidth * 0.03),
-            border: _controller.selectedPaymentMethod == content ? Border.all(color: const Color(0xFFFCC434)) : null,
+            border: _controller.selectedPaymentMethod == content
+                ? Border.all(color: const Color(0xFFFCC434))
+                : null,
           ),
           child: Row(
             children: [
               Container(
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(screenWidth * 0.02)),
-                child: Image.asset(image, fit: BoxFit.cover, width: screenWidth * 0.1),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(screenWidth * 0.02)),
+                child: Image.asset(image,
+                    fit: BoxFit.cover, width: screenWidth * 0.1),
               ),
               SizedBox(width: screenWidth * 0.04),
-              Expanded(child: Text(content, style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500, color: Colors.white))),
-              const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.white),
+              Expanded(
+                  child: Text(content,
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white))),
+              const Icon(Icons.arrow_forward_ios,
+                  size: 18, color: Colors.white),
             ],
           ),
         ),
@@ -96,14 +109,21 @@ class _PaymentState extends State<Payment> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Payment", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+        title: const Text("Payment",
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Colors.white)),
         centerTitle: true,
         surfaceTintColor: Colors.black,
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: screenHeight * 0.01, right: screenWidth * 0.04, left: screenWidth * 0.04),
+          padding: EdgeInsets.only(
+              top: screenHeight * 0.01,
+              right: screenWidth * 0.04,
+              left: screenWidth * 0.04),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -113,34 +133,50 @@ class _PaymentState extends State<Payment> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Order ID", style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.white)),
-                  Text(_controller.orderID, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text("Order ID",
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.045, color: Colors.white)),
+                  Text(_controller.orderID,
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                 ],
               ),
               SizedBox(height: screenHeight * 0.015),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Seat", style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.white)),
-                  Text(widget.selectedSeats.join(', '), style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text("Seat",
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.045, color: Colors.white)),
+                  Text(widget.selectedSeats.join(', '),
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                 ],
               ),
               SizedBox(height: screenHeight * 0.02),
               Container(
-                decoration: BoxDecoration(color: const Color(0xFF1C1C1C), borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+                decoration: BoxDecoration(
+                    color: const Color(0xFF1C1C1C),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03)),
                 child: Row(
                   children: [
                     Expanded(
                       child: TextField(
                         decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.local_offer_rounded, color: Color(0xFFFCC434)),
+                          prefixIcon: Icon(Icons.local_offer_rounded,
+                              color: Color(0xFFFCC434)),
                           hintText: 'Discount Code',
                           hintStyle: TextStyle(color: Colors.grey),
                           border: InputBorder.none,
                         ),
                         controller: _controller.textController,
                         textAlignVertical: TextAlignVertical.center,
-                        style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: screenWidth * 0.04),
                       ),
                     ),
                     GestureDetector(
@@ -149,10 +185,15 @@ class _PaymentState extends State<Payment> {
                         borderRadius: BorderRadius.circular(screenWidth * 0.03),
                         child: Container(
                           color: const Color(0xFFFCC434),
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06, vertical: screenHeight * 0.015),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.06,
+                              vertical: screenHeight * 0.015),
                           child: Text(
                             "Apply",
-                            style: TextStyle(color: Colors.black, fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: screenWidth * 0.04,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -161,57 +202,83 @@ class _PaymentState extends State<Payment> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.03),
-              const Divider(color: Color(0xFF2E2E2E), height: 0.2, thickness: 1),
+              const Divider(
+                  color: Color(0xFF2E2E2E), height: 0.2, thickness: 1),
               SizedBox(height: screenHeight * 0.03),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total", style: TextStyle(fontSize: screenWidth * 0.045, color: Colors.white)),
+                  Text("Total",
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.045, color: Colors.white)),
                   Text(
-                    NumberFormat.currency(locale: "vi_VN", symbol: "VND ").format(widget.totalPrice - _controller.discount),
-                    style: TextStyle(color: const Color(0xFFFCC434), fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold),
+                    NumberFormat.currency(locale: "vi_VN", symbol: "VND ")
+                        .format(widget.totalPrice - _controller.discount),
+                    style: TextStyle(
+                        color: const Color(0xFFFCC434),
+                        fontSize: screenWidth * 0.06,
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               SizedBox(height: screenHeight * 0.02),
-              Text("Payment Method", style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text("Payment Method",
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white)),
               SizedBox(height: screenHeight * 0.015),
-              buildPaymentMethod(image: "assets/images/Zalopay.png", content: "Zalo Pay"),
+              buildPaymentMethod(
+                  image: "assets/images/Zalopay.png", content: "Zalo Pay"),
               SizedBox(height: screenHeight * 0.01),
-              buildPaymentMethod(image: "assets/images/Momo.png", content: "MoMo"),
+              buildPaymentMethod(
+                  image: "assets/images/Momo.png", content: "MoMo"),
               SizedBox(height: screenHeight * 0.01),
-              buildPaymentMethod(image: "assets/images/ShopeePay.png", content: "Shopee Pay"),
+              buildPaymentMethod(
+                  image: "assets/images/ShopeePay.png", content: "Shopee Pay"),
               SizedBox(height: screenHeight * 0.01),
-              buildPaymentMethod(image: "assets/images/ATM.png", content: "ATM Card"),
+              buildPaymentMethod(
+                  image: "assets/images/ATM.png", content: "ATM Card"),
               SizedBox(height: screenHeight * 0.01),
-              buildPaymentMethod(image: "assets/images/Visa.png", content: "International payments"),
+              buildPaymentMethod(
+                  image: "assets/images/Visa.png",
+                  content: "International payments"),
               SizedBox(height: screenHeight * 0.03),
               Container(
                 width: double.infinity,
-                decoration: BoxDecoration(color: const Color(0xFFFCC434), borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+                decoration: BoxDecoration(
+                    color: const Color(0xFFFCC434),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03)),
                 child: TextButton(
                   onPressed: () async {
                     if (_controller.selectedPaymentMethod.isEmpty) {
-                      DialogHelper.showCustomDialog(context, "Thông báo", "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
+                      DialogHelper.showCustomDialog(context, "Thông báo",
+                          "Vui lòng chọn phương thức thanh toán trước khi tiếp tục!");
                     } else {
                       try {
                         await _controller.savePaymentInfoToFirebase(context);
                         Navigator.push(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => const MainScreen(initialIndex: 1),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    const MainScreen(initialIndex: 1),
                             transitionDuration: Duration.zero,
                             reverseTransitionDuration: Duration.zero,
                           ),
                         );
                       } catch (e) {
-                        DialogHelper.showCustomDialog(context, "Lỗi", "Không thể lưu vé, vui lòng thử lại!");
+                        DialogHelper.showCustomDialog(context, "Lỗi",
+                            "Không thể lưu vé, vui lòng thử lại!");
                       }
                     }
                   },
                   child: Text(
                     "Continue",
-                    style: TextStyle(fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.06,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   ),
                 ),
               ),
@@ -225,13 +292,17 @@ class _PaymentState extends State<Payment> {
   Widget buildInforMovie() {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      decoration: BoxDecoration(color: const Color(0xFF1C1C1C), borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+      decoration: BoxDecoration(
+          color: const Color(0xFF1C1C1C),
+          borderRadius: BorderRadius.circular(screenWidth * 0.03)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(8.0), bottomLeft: Radius.circular(8.0)),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                bottomLeft: Radius.circular(8.0)),
             child: Image.network(
               "https://image.tmdb.org/t/p/original${widget.moviePoster}",
               height: 150,
@@ -248,7 +319,10 @@ class _PaymentState extends State<Payment> {
                 SizedBox(height: screenWidth * 0.04),
                 Text(
                   widget.movieTitle,
-                  style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w700, color: const Color(0xFFFCC434)),
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFFFCC434)),
                   overflow: TextOverflow.fade,
                   softWrap: true,
                 ),
@@ -260,7 +334,10 @@ class _PaymentState extends State<Payment> {
                     Expanded(
                       child: Text(
                         widget.genres.join(', '),
-                        style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6), overflow: TextOverflow.ellipsis),
+                        style: TextStyle(
+                            fontSize: screenWidth * 0.035,
+                            color: const Color(0xFFE6E6E6),
+                            overflow: TextOverflow.ellipsis),
                         maxLines: 1,
                       ),
                     ),
@@ -271,7 +348,10 @@ class _PaymentState extends State<Payment> {
                   children: [
                     const Text("🍿", style: TextStyle(fontSize: 14)),
                     SizedBox(width: screenWidth * 0.015),
-                    Text(widget.cinemaName, style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6))),
+                    Text(widget.cinemaName,
+                        style: TextStyle(
+                            fontSize: screenWidth * 0.035,
+                            color: const Color(0xFFE6E6E6))),
                   ],
                 ),
                 SizedBox(height: screenWidth * 0.01),
@@ -281,12 +361,19 @@ class _PaymentState extends State<Payment> {
                     SizedBox(width: screenWidth * 0.015),
                     Text(
                       DateFormat("dd.MM.yyyy").format(widget.showDate),
-                      style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6)),
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.035,
+                          color: const Color(0xFFE6E6E6)),
                     ),
                     SizedBox(width: screenWidth * 0.015),
-                    const Text("•", style: TextStyle(fontSize: 14, color: Color(0xFFE6E6E6))),
+                    const Text("•",
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xFFE6E6E6))),
                     SizedBox(width: screenWidth * 0.015),
-                    Text(widget.showTime, style: TextStyle(fontSize: screenWidth * 0.035, color: const Color(0xFFE6E6E6))),
+                    Text(widget.showTime,
+                        style: TextStyle(
+                            fontSize: screenWidth * 0.035,
+                            color: const Color(0xFFE6E6E6))),
                   ],
                 ),
               ],

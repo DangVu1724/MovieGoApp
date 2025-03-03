@@ -24,6 +24,7 @@ class SignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: onTap,
       onTapDown: (_) => onTapDown(),
@@ -32,25 +33,28 @@ class SignInButton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: buttonColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(screenWidth * 0.04),
         ),
-        width: MediaQuery.of(context).size.width * 1,
-        padding: const EdgeInsets.all(16),
+        width: screenWidth * 0.9,
+        padding: EdgeInsets.all(screenWidth * 0.04),
         child: Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
                 iconPath,
-                width: 25,
-                height: 25,
+                width: screenWidth * 0.06,
+                height: screenWidth * 0.06,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02),
               Text(
                 text,
                 style: TextStyle(
-                    color: textColor, fontSize: 16, fontFamily: 'Open_Sans_1'),
+                    color: textColor,
+                    fontSize: screenWidth * 0.042,
+                    fontFamily: 'Open_Sans_1',
+                    fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
             ],

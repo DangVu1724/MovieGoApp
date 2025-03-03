@@ -46,7 +46,7 @@ class AuthService {
             email: email, password: password);
         res = "Successfully";
       } else {
-        res = "Please enter all te field";
+        res = "Please enter all text field";
       }
     } catch (e) {
       res = "Unexpected error: ${e.toString()}";
@@ -56,5 +56,21 @@ class AuthService {
 
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  Future<String> getUserName() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      if (user.displayName != null && user.displayName!.isNotEmpty) {
+        return user.displayName!;
+      }
+      DocumentSnapshot userDoc =
+          await _firestore.collection("users").doc(user.uid).get();
+      if (userDoc.exists && userDoc.data() != null) {
+        return (userDoc.data() as Map<String, dynamic>)['name'] ?? "Guest";
+      }
+    }
+
+    return "Guest";
   }
 }

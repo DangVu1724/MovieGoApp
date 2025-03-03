@@ -10,7 +10,8 @@ class TicketDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final movieTitle = ticketDetails['movieTitle'] ?? 'Không có tiêu đề';
     final cinemaName = ticketDetails['cinemaName'] ?? 'Không có tên rạp';
-    final selectedSeats = (ticketDetails['selectedSeats'] as String?)?.split(',') ?? [];
+    final selectedSeats =
+        (ticketDetails['selectedSeats'] as String?)?.split(',') ?? [];
     final showTime = ticketDetails['showTime'] ?? 'Không có thời gian chiếu';
     final showDate = ticketDetails['showDate'] ?? 'Không có thời gian chiếu';
     final totalPrice = ticketDetails['totalPrice'] ?? 'Không có giá';
@@ -58,7 +59,9 @@ class TicketDetail extends StatelessWidget {
                   movieRuntime: movieRuntime,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.04,
+                      vertical: screenHeight * 0.015),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -70,7 +73,8 @@ class TicketDetail extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                  child: const Divider(color: Colors.black54, height: 1, thickness: 1),
+                  child: const Divider(
+                      color: Colors.black54, height: 1, thickness: 1),
                 ),
                 inforTicket(
                   totalPrice: totalPrice,
@@ -79,13 +83,21 @@ class TicketDetail extends StatelessWidget {
                   cinemaAddress: cinemaAddress,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.01),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.04,
+                      vertical: screenHeight * 0.01),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(width: screenWidth * 0.08, child: Image.asset("assets/images/e1.png")),
-                      Expanded(child: Image.asset("assets/images/Line.png", fit: BoxFit.fitWidth)),
-                      SizedBox(width: screenWidth * 0.08, child: Image.asset("assets/images/e2.png")),
+                      SizedBox(
+                          width: screenWidth * 0.08,
+                          child: Image.asset("assets/images/e1.png")),
+                      Expanded(
+                          child: Image.asset("assets/images/Line.png",
+                              fit: BoxFit.fitWidth)),
+                      SizedBox(
+                          width: screenWidth * 0.08,
+                          child: Image.asset("assets/images/e2.png")),
                     ],
                   ),
                 ),
@@ -99,7 +111,10 @@ class TicketDetail extends StatelessWidget {
                 Center(
                   child: Text(
                     "OrderID: $orderID",
-                    style: TextStyle(fontSize: screenWidth * 0.03, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.03,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -140,7 +155,8 @@ class inforTicket extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -151,7 +167,10 @@ class inforTicket extends StatelessWidget {
               Expanded(
                 child: Text(
                   "${NumberFormat('#,###', 'vi_VN').format(int.tryParse(totalPrice) ?? 0)} VND",
-                  style: TextStyle(fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -172,7 +191,10 @@ class inforTicket extends StatelessWidget {
                         Expanded(
                           child: Text(
                             cinemaName,
-                            style: TextStyle(fontSize: screenWidth * 0.035, color: Colors.black87, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: screenWidth * 0.035,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -180,13 +202,18 @@ class inforTicket extends StatelessWidget {
                         SizedBox(
                           width: screenWidth * 0.05,
                           height: screenWidth * 0.05,
-                          child: Image.asset(cinemaImage, errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, size: 18)),
+                          child: Image.asset(cinemaImage,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.error, size: 18)),
                         ),
                       ],
                     ),
                     Text(
                       cinemaAddress,
-                      style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.03,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                     ),
@@ -204,7 +231,10 @@ class inforTicket extends StatelessWidget {
               Expanded(
                 child: Text(
                   "Show this QR code to the ticket counter to receive your ticket",
-                  style: TextStyle(fontSize: screenWidth * 0.032, color: Colors.black87, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.032,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500),
                   overflow: TextOverflow.clip,
                   maxLines: 2,
                 ),
@@ -237,7 +267,8 @@ class inforMovie extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -255,7 +286,10 @@ class inforMovie extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   )
-                : Container(height: screenHeight * 0.15, width: screenWidth * 0.2, color: Colors.grey),
+                : Container(
+                    height: screenHeight * 0.15,
+                    width: screenWidth * 0.2,
+                    color: Colors.grey),
           ),
           SizedBox(width: screenWidth * 0.03),
           Expanded(
@@ -264,7 +298,10 @@ class inforMovie extends StatelessWidget {
               children: [
                 Text(
                   movieTitle,
-                  style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.w700, color: Colors.black87),
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.04,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
@@ -276,7 +313,9 @@ class inforMovie extends StatelessWidget {
                     Expanded(
                       child: Text(
                         genres.join(', '),
-                        style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87),
+                        style: TextStyle(
+                            fontSize: screenWidth * 0.03,
+                            color: Colors.black87),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -291,7 +330,9 @@ class inforMovie extends StatelessWidget {
                     Expanded(
                       child: Text(
                         formatRuntime(movieRuntime),
-                        style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87),
+                        style: TextStyle(
+                            fontSize: screenWidth * 0.03,
+                            color: Colors.black87),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -317,21 +358,30 @@ class seat extends StatelessWidget {
 
     return Row(
       children: [
-        SizedBox(width: screenWidth * 0.05, height: screenWidth * 0.05, child: Image.asset("assets/images/seat_cinema.png")),
+        SizedBox(
+            width: screenWidth * 0.05,
+            height: screenWidth * 0.05,
+            child: Image.asset("assets/images/seat_cinema.png")),
         SizedBox(width: screenWidth * 0.02),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "Section 4",
-              style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.03,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(height: screenWidth * 0.005),
             SizedBox(
               width: screenWidth * 0.35,
               child: Text(
                 selectedSeats.join(', '),
-                style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: screenWidth * 0.03,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -355,20 +405,29 @@ class calender extends StatelessWidget {
 
     return Row(
       children: [
-        SizedBox(width: screenWidth * 0.05, height: screenWidth * 0.05, child: Image.asset("assets/images/calendar.png")),
+        SizedBox(
+            width: screenWidth * 0.05,
+            height: screenWidth * 0.05,
+            child: Image.asset("assets/images/calendar.png")),
         SizedBox(width: screenWidth * 0.02),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               showTime,
-              style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.03,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold),
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: screenWidth * 0.005),
             Text(
               DateFormat("dd.MM.yyyy").format(DateTime.parse(showDate)),
-              style: TextStyle(fontSize: screenWidth * 0.03, color: Colors.black87, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.03,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold),
               overflow: TextOverflow.ellipsis,
             ),
           ],
