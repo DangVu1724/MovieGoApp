@@ -414,7 +414,17 @@ class _SignInPassState extends State<SignInPass> {
                       _googleButtonColor =
                           const Color.fromARGB(197, 55, 38, 38);
                     });
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    );
                     await FirebaseServices().signInWithGoogle();
+                    Navigator.of(context).pop();
                     if (FirebaseAuth.instance.currentUser != null) {
                       Navigator.pushReplacement(
                         context,
