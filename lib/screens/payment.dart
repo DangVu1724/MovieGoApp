@@ -16,6 +16,8 @@ class Payment extends StatefulWidget {
   final String moviePoster;
   final List<String> genres;
   final int movieRuntime;
+  final List<String> availableTimes;
+  final int selectedTimeIndex;
 
   const Payment({
     super.key,
@@ -30,6 +32,8 @@ class Payment extends StatefulWidget {
     required this.cinemaAddress,
     required this.cinemaImage,
     required this.movieRuntime,
+    required this.availableTimes,
+    required this.selectedTimeIndex,
   });
 
   @override
@@ -257,6 +261,14 @@ class _PaymentState extends State<Payment> {
                     } else {
                       try {
                         await _controller.savePaymentInfoToFirebase(context);
+                        await _controller.saveBookedSeats(
+                          context,
+                          widget.showDate,
+                          widget.selectedTimeIndex,
+                          widget.selectedSeats,
+                          widget.availableTimes,
+                          widget.cinemaName,
+                        );
                         Navigator.push(
                           context,
                           PageRouteBuilder(

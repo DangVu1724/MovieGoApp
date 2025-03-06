@@ -171,7 +171,6 @@ class _SelectSeatState extends State<SelectSeat> {
                           onPressed: () async {
                             _controller.updateSelectedSeatsList();
                             if (_controller.calculatePrice() > 0) {
-                              await _controller.saveBookedSeats(context);
                               if (mounted) {
                                 Navigator.of(context).push(
                                   PageRouteBuilder(
@@ -191,6 +190,8 @@ class _SelectSeatState extends State<SelectSeat> {
                                       moviePoster: widget.moviePoster,
                                       genres: widget.genres,
                                       movieRuntime: widget.movieRuntime,
+                                      availableTimes: _controller.availableTimes,
+                                      selectedTimeIndex: _controller.selectedTimeIndex,
                                     ),
                                     transitionDuration: Duration.zero,
                                     reverseTransitionDuration: Duration.zero,

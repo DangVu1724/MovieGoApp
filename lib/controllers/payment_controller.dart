@@ -101,18 +101,10 @@ class PaymentController {
       });
 
       print("Vé đã được lưu vào Firebase với orderID: $orderID");
-      await saveBookedSeats(selectedSeats);
     } catch (e) {
       print("Lỗi khi lưu vé: $e");
       throw Exception("Không thể lưu vé: $e");
     }
-  }
-
-  // Lưu ghế đã đặt vào SharedPreferences
-  Future<void> saveBookedSeats(List<String> seats) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('bookedSeats', seats);
-    print("Booked seats saved successfully.");
   }
 
   // Xóa toàn bộ SharedPreferences (nếu cần)
@@ -125,4 +117,32 @@ class PaymentController {
   void dispose() {
     textController.dispose();
   }
+
+  Future<void> saveBookedSeats(BuildContext context, DateTime selectedDate, int selectedTimeIndex, List<String> selectedSeatsList, List<String> availableTimes, String cinemaName) async {
+  try {
+    String showtimeID = "${movieTitle}_${DateFormat('yyyy-MM-dd').format(selectedDate)}_${availableTimes[selectedTimeIndex]}";
+    DocumentReference docRef = FirebaseFirestore.instance
+        .collection('cinemas')
+        .doc(cinemaName)
+        .collection('showtimes')
+        .doc(showtimeID);
+
+    DocumentSnapshot doc = await docRef.get();
+    List<String> existingBookedSeats = doc.exists ? List<String>.from(doc['bookedSeats'] ?? []) : [];
+    existingBookedSeats.addAll(selectedSeatsList.where((seat) => !existingBookedSeats.contains(seat)));
+
+    await docRef.set({
+      'movieTitle': movieTitle,
+      'showDate': DateFormat('yyyy-MM-dd').format(selectedDate),
+      'showTime': availableTimes[selectedTimeIndex],
+      'bookedSeats': existingBookedSeats,
+      'timestamp': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    print("Booked seats saved to Firestore: $existingBookedSeats");
+  } catch (e) {
+    print("Error saving booked seats: $e");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to save seats: $e")));
+  }
+}
 }

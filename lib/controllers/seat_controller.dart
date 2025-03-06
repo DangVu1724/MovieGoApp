@@ -67,33 +67,7 @@ class SeatController {
   }
 
   // Lưu ghế lên Firebase
-  Future<void> saveBookedSeats(BuildContext context) async {
-    try {
-      String showtimeID = "${movieTitle}_${DateFormat('yyyy-MM-dd').format(selectedDate)}_${availableTimes[selectedTimeIndex]}";
-      DocumentReference docRef = FirebaseFirestore.instance
-          .collection('cinemas')
-          .doc(cinemaName)
-          .collection('showtimes')
-          .doc(showtimeID);
-
-      DocumentSnapshot doc = await docRef.get();
-      List<String> existingBookedSeats = doc.exists ? List<String>.from(doc['bookedSeats'] ?? []) : [];
-      existingBookedSeats.addAll(selectedSeatsList.where((seat) => !existingBookedSeats.contains(seat)));
-
-      await docRef.set({
-        'movieTitle': movieTitle,
-        'showDate': DateFormat('yyyy-MM-dd').format(selectedDate),
-        'showTime': availableTimes[selectedTimeIndex],
-        'bookedSeats': existingBookedSeats,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-
-      print("Booked seats saved to Firestore: $existingBookedSeats");
-    } catch (e) {
-      print("Error saving booked seats: $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to save seats: $e")));
-    }
-  }
+  
 
   // Chọn ngày
   void setSelectedDate(DateTime date, Function setState) {

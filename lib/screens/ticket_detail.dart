@@ -63,7 +63,7 @@ class TicketDetail extends StatelessWidget {
                       horizontal: screenWidth * 0.04,
                       vertical: screenHeight * 0.015),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       calender(showTime: showTime, showDate: showDate),
                       SizedBox(width: screenWidth * 0.02),
