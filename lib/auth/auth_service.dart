@@ -4,13 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  Future<String> signUpUser(
-      {required String email,
-      required String userName,
-      required password}) async {
+
+  Future<String> signUpUser({
+    required String email,
+    required String userName,
+    required String password,
+  }) async {
     String res = "Something went wrong";
     try {
-      if (email.isNotEmpty || password.isNotEmpty || userName.isNotEmpty) {
+      if (email.isNotEmpty && password.isNotEmpty && userName.isNotEmpty) {
         UserCredential credential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
@@ -20,8 +22,11 @@ class AuthService {
           'name': userName,
           'email': email,
           'password': password,
+          'authMethod': 'email/password',
         });
         res = "Successfully";
+      } else {
+        res = "Please enter all text fields";
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'network-request-failed') {
@@ -43,10 +48,12 @@ class AuthService {
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
         await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
+          email: email,
+          password: password,
+        );
         res = "Successfully";
       } else {
-        res = "Please enter all text field";
+        res = "Please enter all text fields";
       }
     } catch (e) {
       res = "Unexpected error: ${e.toString()}";
@@ -70,7 +77,6 @@ class AuthService {
         return (userDoc.data() as Map<String, dynamic>)['name'] ?? "Guest";
       }
     }
-
     return "Guest";
   }
 }

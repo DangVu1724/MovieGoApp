@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:moviego/LoginWithGoogle/google_auth.dart';
 import 'package:moviego/pages/sign_in_password.dart';
 import 'package:moviego/screens/changePassWord.dart';
 import 'package:moviego/screens/ticket.dart';
@@ -17,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late Future<String> _userNameFuture;
+  final FirebaseServices _authService = FirebaseServices();
 
   @override
   void initState() {
@@ -46,11 +48,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> signOut() async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const SignInPass()),
-    );
+    bool success = await _authService.googleSignOut();
+    if (success && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignInPass()),
+      );
+    } else {
+      print("Sign out failed");
+    }
   }
 
   void showLogoutDialog() {
@@ -83,8 +89,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    Navigator.of(context).pop();
-                    await signOut();
+                    Navigator.of(context).pop(); // Đóng dialog
+                    await signOut(); // Gọi hàm signOut
                   },
                   child: const Text(
                     'Confirm',

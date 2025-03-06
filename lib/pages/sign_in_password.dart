@@ -415,12 +415,13 @@ class _SignInPassState extends State<SignInPass> {
                           const Color.fromARGB(197, 55, 38, 38);
                     });
                     await FirebaseServices().signInWithGoogle();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MainScreen(),
-                      ),
-                    );
+                    if (FirebaseAuth.instance.currentUser != null) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MainScreen()),
+                      );
+                    }
                   },
                   onTapCancel: () {
                     setState(() {

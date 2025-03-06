@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:moviego/CustomUI/linecustom.dart';
 import 'package:moviego/LoginWithGoogle/google_auth.dart';
@@ -147,12 +148,13 @@ class _SignInAPIState extends State<SignInAPI> {
                               const Color.fromARGB(162, 255, 255, 255);
                         });
                         await FirebaseServices().signInWithGoogle();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ),
-                        );
+                        if (FirebaseAuth.instance.currentUser != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MainScreen()),
+                          );
+                        }
                       },
                       onTapCancel: () {
                         setState(() {
