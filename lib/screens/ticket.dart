@@ -137,7 +137,7 @@ class TicketPage extends StatelessWidget {
                                         child: Text(
                                           genres.join(', '),
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 14,
                                               color: Color(0xFFE6E6E6),
                                               overflow: TextOverflow.ellipsis),
                                           maxLines: 1,
@@ -154,7 +154,7 @@ class TicketPage extends StatelessWidget {
                                       Text(
                                         cinemaName,
                                         style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             color: Color(0xFFE6E6E6)),
                                       ),
                                     ],
@@ -168,7 +168,7 @@ class TicketPage extends StatelessWidget {
                                       Text(
                                         "${NumberFormat('#,###', 'vi_VN').format(int.parse(totalPrice))} VND",
                                         style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ],

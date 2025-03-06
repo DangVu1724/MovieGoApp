@@ -15,7 +15,7 @@ class TicketDetail extends StatelessWidget {
     final showTime = ticketDetails['showTime'] ?? 'Không có thời gian chiếu';
     final showDate = ticketDetails['showDate'] ?? 'Không có thời gian chiếu';
     final totalPrice = ticketDetails['totalPrice'] ?? 'Không có giá';
-    final moviePoster = ticketDetails['moviePoster'] ?? '';
+    final moviePoster = ticketDetails['moviePoster'] ?? 'khong co gi';
     final orderID = ticketDetails['orderID'] ?? 'N/A';
     final genres = (ticketDetails['genres'] as String?)?.split(',') ?? [];
     final cinemaImage = ticketDetails['cinemaImage'] ?? 'khong co gi';
@@ -25,6 +25,7 @@ class TicketDetail extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    print("🔍 Debug - Movie Poster URL: $moviePoster");
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -48,34 +49,46 @@ class TicketDetail extends StatelessWidget {
             ),
           ),
           SingleChildScrollView(
+            
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              
               children: [
                 SizedBox(height: screenHeight * 0.02),
+                
                 inforMovie(
                   moviePoster: moviePoster,
                   movieTitle: movieTitle,
                   genres: genres,
                   movieRuntime: movieRuntime,
                 ),
+                SizedBox(height: screenHeight * 0.02),
                 Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: screenWidth * 0.04,
                       vertical: screenHeight * 0.015),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceEvenly, 
                     children: [
-                      calender(showTime: showTime, showDate: showDate),
-                      SizedBox(width: screenWidth * 0.02),
-                      seat(selectedSeats: selectedSeats),
+                      Flexible(
+                        flex: 1,
+                        child: Calendar(showTime: showTime, showDate: showDate),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Seat(selectedSeats: selectedSeats),
+                      ),
                     ],
                   ),
                 ),
+                SizedBox(height: screenHeight * 0.02),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
                   child: const Divider(
                       color: Colors.black54, height: 1, thickness: 1),
                 ),
+                SizedBox(height: screenHeight * 0.02),
                 inforTicket(
                   totalPrice: totalPrice,
                   cinemaName: cinemaName,
@@ -103,7 +116,7 @@ class TicketDetail extends StatelessWidget {
                 ),
                 Center(
                   child: SizedBox(
-                    width: screenWidth * 0.2,
+                    width: screenWidth * 0.5,
                     child: Image.asset("assets/images/Frame.png"),
                   ),
                 ),
@@ -132,7 +145,7 @@ String formatRuntime(String runtime) {
   int minutes = int.tryParse(runtime) ?? 0;
   int hours = minutes ~/ 60;
   int remainingMinutes = minutes % 60;
-  return "$hours h $remainingMinutes m";
+  return "$hours hour $remainingMinutes minutes";
 }
 
 class inforTicket extends StatelessWidget {
@@ -156,7 +169,7 @@ class inforTicket extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+          horizontal: screenWidth * 0.06, vertical: screenHeight * 0.02),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -168,7 +181,7 @@ class inforTicket extends StatelessWidget {
                 child: Text(
                   "${NumberFormat('#,###', 'vi_VN').format(int.tryParse(totalPrice) ?? 0)} VND",
                   style: TextStyle(
-                      fontSize: screenWidth * 0.035,
+                      fontSize: screenWidth * 0.04,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87),
                   overflow: TextOverflow.ellipsis,
@@ -272,13 +285,15 @@ class inforMovie extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          
           ClipRRect(
             borderRadius: BorderRadius.circular(screenWidth * 0.02),
-            child: moviePoster.isNotEmpty
+            
+            child: moviePoster.isNotEmpty && moviePoster != 'khong co gi'
                 ? Image.network(
                     "https://image.tmdb.org/t/p/original$moviePoster",
-                    height: screenHeight * 0.2,
-                    width: screenWidth * 0.3,
+                    height: screenHeight * 0.25,
+                    width: screenWidth * 0.35,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       height: screenHeight * 0.15,
@@ -299,7 +314,7 @@ class inforMovie extends StatelessWidget {
                 Text(
                   movieTitle,
                   style: TextStyle(
-                      fontSize: screenWidth * 0.04,
+                      fontSize: screenWidth * 0.05,
                       fontWeight: FontWeight.w700,
                       color: Colors.black87),
                   overflow: TextOverflow.ellipsis,
@@ -308,7 +323,7 @@ class inforMovie extends StatelessWidget {
                 SizedBox(height: screenHeight * 0.01),
                 Row(
                   children: [
-                    const Text("🎬", style: TextStyle(fontSize: 11)),
+                    const Text("🎬", style: TextStyle(fontSize: 12)),
                     SizedBox(width: screenWidth * 0.01),
                     Expanded(
                       child: Text(
@@ -325,7 +340,7 @@ class inforMovie extends StatelessWidget {
                 SizedBox(height: screenHeight * 0.005),
                 Row(
                   children: [
-                    const Text("🕒", style: TextStyle(fontSize: 11)),
+                    const Text("🕒", style: TextStyle(fontSize: 12)),
                     SizedBox(width: screenWidth * 0.01),
                     Expanded(
                       child: Text(
@@ -347,90 +362,87 @@ class inforMovie extends StatelessWidget {
   }
 }
 
-class seat extends StatelessWidget {
-  const seat({super.key, required this.selectedSeats});
+class Seat extends StatelessWidget {
+  const Seat({super.key, required this.selectedSeats});
 
   final List<String> selectedSeats;
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Row(
+      mainAxisSize: MainAxisSize.min, // Giới hạn kích thước theo nội dung
       children: [
-        SizedBox(
-            width: screenWidth * 0.05,
-            height: screenWidth * 0.05,
-            child: Image.asset("assets/images/seat_cinema.png")),
-        SizedBox(width: screenWidth * 0.02),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Section 4",
-              style: TextStyle(
-                  fontSize: screenWidth * 0.03,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: screenWidth * 0.005),
-            SizedBox(
-              width: screenWidth * 0.35,
-              child: Text(
+        Image.asset(
+          "assets/images/seat_cinema.png",
+          width: 24,
+          height: 24,
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Ghế đã chọn",
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              Text(
                 selectedSeats.join(', '),
-                style: TextStyle(
-                    fontSize: screenWidth * 0.03,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-class calender extends StatelessWidget {
-  const calender({super.key, required this.showTime, required this.showDate});
+class Calendar extends StatelessWidget {
+  const Calendar({super.key, required this.showTime, required this.showDate});
 
   final String showTime;
   final String showDate;
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Row(
+      mainAxisSize: MainAxisSize.min, // Giới hạn kích thước theo nội dung
       children: [
-        SizedBox(
-            width: screenWidth * 0.05,
-            height: screenWidth * 0.05,
-            child: Image.asset("assets/images/calendar.png")),
-        SizedBox(width: screenWidth * 0.02),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              showTime,
-              style: TextStyle(
-                  fontSize: screenWidth * 0.03,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: screenWidth * 0.005),
-            Text(
-              DateFormat("dd.MM.yyyy").format(DateTime.parse(showDate)),
-              style: TextStyle(
-                  fontSize: screenWidth * 0.03,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+        Image.asset(
+          "assets/images/calendar.png",
+          width: 24,
+          height: 24,
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                showTime,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              Text(
+                DateFormat("dd.MM.yyyy").format(DateTime.parse(showDate)),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ],
+          ),
         ),
       ],
     );
