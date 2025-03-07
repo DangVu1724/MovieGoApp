@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:moviego/Model/movie.dart';
 import 'package:moviego/controllers/movie_detail_controller.dart'; // Import Controller
 import 'package:moviego/screens/select_seat.dart';
-import 'package:moviego/widgets/censorship.dart';
-import 'package:moviego/widgets/credits.dart';
+import 'package:moviego/widgets/movieDetails/censorship.dart';
+import 'package:moviego/widgets/movieDetails/credits.dart';
 import 'package:moviego/widgets/dialog_helper.dart';
-import 'package:moviego/widgets/genres.dart';
-import 'package:moviego/widgets/language.dart';
+import 'package:moviego/widgets/movieDetails/genres.dart';
+import 'package:moviego/widgets/movieDetails/language.dart';
 import 'package:readmore/readmore.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

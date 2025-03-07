@@ -50,9 +50,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> signOut() async {
     bool success = await _authService.googleSignOut();
     if (success && mounted) {
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const SignInPass()),
+        (Route<dynamic> route) => false,
       );
     } else {
       print("Sign out failed");

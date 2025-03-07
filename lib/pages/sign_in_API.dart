@@ -149,10 +149,12 @@ class _SignInAPIState extends State<SignInAPI> {
                         });
                         await FirebaseServices().signInWithGoogle();
                         if (FirebaseAuth.instance.currentUser != null) {
-                          Navigator.pushReplacement(
+                          Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const MainScreen()),
+                                builder: (context) => MainScreen()),
+                            (Route<dynamic> route) =>
+                                false, 
                           );
                         }
                       },

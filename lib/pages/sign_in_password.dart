@@ -45,9 +45,11 @@ class _SignInPassState extends State<SignInPass> {
       setState(() {
         isLoading = true;
       });
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const MainScreen(),
-      ));
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+        (Route<dynamic> route) => false, // 👈 Xóa tất cả màn hình trước đó
+      );
     } else {
       setState(() {
         isLoading = false;
@@ -426,10 +428,11 @@ class _SignInPassState extends State<SignInPass> {
                     await FirebaseServices().signInWithGoogle();
                     Navigator.of(context).pop();
                     if (FirebaseAuth.instance.currentUser != null) {
-                      Navigator.pushReplacement(
+                      Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const MainScreen()),
+                        MaterialPageRoute(builder: (context) => MainScreen()),
+                        (Route<dynamic> route) =>
+                            false, // 👈 Xóa tất cả màn hình trước đó
                       );
                     }
                   },

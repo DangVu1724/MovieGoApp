@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:moviego/Services/local_notification_service.dart';
 import 'package:moviego/firebase_options.dart';
 import 'package:moviego/pages/sign_in_API.dart';
+import 'package:moviego/widgets/bottom_app_bar.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
@@ -40,13 +42,27 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
-      home: const SignInAPI(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(), 
+            );
+          } else if (snapshot.hasData) {
+            return const MainScreen(); 
+          } else {
+            return const SignInAPI(); 
+          }
+        },
+      ),
     );
   }
 }
